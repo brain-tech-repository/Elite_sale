@@ -190,7 +190,7 @@ export default function Salesdashboard() {
                 data={tableData}
                 pageSize={10}
                 headerTitle={tableTitle}
-                height={940} // Adjusted slightly to match the 3-chart stack height
+                height={550} // Adjusted slightly to match the 3-chart stack height
                 isFetchingMore={isSubLoading || isFilterLoading}
                 key={
                   selectedCategoryId

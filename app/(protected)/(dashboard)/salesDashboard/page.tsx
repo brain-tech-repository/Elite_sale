@@ -5,7 +5,6 @@ import DataTableHeader from "@/components/table-data/data-table-header";
 import DataTableSubHeader from "@/components/table-data/data-table-sub-header";
 import { CommonDataTable } from "@/components/table-data/custom-table";
 import { Card } from "@/components/ui/card";
-// import { RoundedPieChart } from "@/components/ui/rounded-pie-chart";
 import { RainbowGlowGradientLineChart } from "@/components/ui/rainbow-glow-gradient-line";
 import { AnimatedHighlightedAreaChart } from "@/components/ui/animated-highlighted-chart";
 /* SKELETON */
@@ -33,7 +32,7 @@ import {
 
 import { GaugePieChartCard } from "@/components/ui/PieChartWithNeedle";
 import { AdvancedBarChart1 } from "@/components/ui/advancebar1";
-import { RoundedPieChart } from "@/components/rounded-pie-charts";
+import { RoundedPieChart } from "@/components/ui/rounded-pi-charts";
 
 export default function Salesdashboa() {
   const getDefaultFilters = () => {
@@ -50,13 +49,17 @@ export default function Salesdashboa() {
   const [selectedMonth, setSelectedMonth] = React.useState<string | null>(
     "April",
   );
-
-  // For Distributor chart (BOTTOM) ✅ NEW
   const [distYear, setDistYear] = React.useState("2026");
   const [distMonth, setDistMonth] = React.useState<string | null>("April");
-
   const [sortType, setSortType] = React.useState("TARGET");
   const [loadStep, setLoadStep] = React.useState(0);
+
+  // Drill-down IDs
+  const [selectedMaterialId, setSelectedMaterialId] =
+    React.useState<string>("");
+  const [selectedRegionId, setSelectedRegionId] = React.useState<string>("");
+  const [selectedBrandId, setSelectedBrandId] = React.useState<string>("");
+  const [selectedSegmentId, setSelectedSegmentId] = React.useState<string>("");
 
   const monthMap: Record<string, string> = {
     Jan: "1",
@@ -72,9 +75,7 @@ export default function Salesdashboa() {
     Nov: "11",
     Dec: "12",
   };
-  const selectedMonthNumber = monthMap[selectedMonth || "Apr"];
 
-  // 1. FILTER HANDLER (Triggers Reset)
   const handleFilter = (data: any) => {
     setLoadStep(-1);
     if (!data) {
@@ -85,8 +86,7 @@ export default function Salesdashboa() {
     setTimeout(() => setLoadStep(0), 50);
   };
 
-  // ================= API CALLS (Strict Sequential) =================
-
+  // ================= API CALLS =================
   const { data: summaryData, isFetching: summaryLoading } = useDashboardSummary(
     filters,
     loadStep >= 0,
@@ -95,56 +95,40 @@ export default function Salesdashboa() {
     useYearlySalesTrend(year, filters, loadStep >= 1);
   const { data: monthlyData = [], isFetching: monthlyLoading } =
     useMonthlySalesTrend(year, selectedMonth, filters, loadStep >= 2);
-  const selectedDistMonthNumber = monthMap[distMonth || "Apr"];
 
+  const selectedDistMonthNumber = monthMap[distMonth || "Apr"];
   const { data: distributorData = [], isFetching: distributorLoading } =
     useDistributorChart(distYear, selectedDistMonthNumber, loadStep >= 3);
-  const { data: regionPerformance = {}, isFetching: regionLoading } =
-    useRegionPerformance(filters, loadStep >= 4);
-  const { data: brandPerformance = {}, isFetching: brandLoading } =
-    useBrandPerformance(filters, loadStep >= 5);
-  const { data: materialGroupPerformance = {}, isFetching: materialLoading } =
-    useMaterialGroupPerformance(filters, loadStep >= 6);
-  const { data: customerSegmentPerformance = {}, isFetching: customerLoading } =
-    useCustomerSegmentPerformance(filters, loadStep >= 7);
+
+  const { data: regionPerformance = {}, isFetching: regionFetching } =
+    useRegionPerformance(filters, selectedRegionId, loadStep >= 4);
+  const { data: brandPerformance = {}, isFetching: brandFetching } =
+    useBrandPerformance(filters, selectedBrandId, loadStep >= 5);
+  const { data: materialGroupPerformance = {}, isFetching: materialFetching } =
+    useMaterialGroupPerformance(filters, selectedMaterialId, loadStep >= 6);
+  const {
+    data: customerSegmentPerformance = {},
+    isFetching: customerFetching,
+  } = useCustomerSegmentPerformance(filters, selectedSegmentId, loadStep >= 7);
 
   // ================= SEQUENCE CONTROLLER =================
-
-  // ================= SEQUENCE CONTROLLER =================
-  // This block ensures that if data is already in the cache,
-  // the waterfall jumps ahead immediately without flashing skeletons.
   React.useEffect(() => {
-    // Step 0 -> 1: Dashboard Summary
-    if (loadStep === 0 && (summaryData || !summaryLoading)) {
-      setLoadStep(1);
-    }
-    // Step 1 -> 2: Yearly Sales Trend
-    if (loadStep === 1 && (yearlyData.length > 0 || !yearlyLoading)) {
+    if (loadStep === 0 && (summaryData || !summaryLoading)) setLoadStep(1);
+    if (loadStep === 1 && (yearlyData.length > 0 || !yearlyLoading))
       setLoadStep(2);
-    }
-    // Step 2 -> 3: Monthly Sales Trend
-    if (loadStep === 2 && (monthlyData.length > 0 || !monthlyLoading)) {
+    if (loadStep === 2 && (monthlyData.length > 0 || !monthlyLoading))
       setLoadStep(3);
-    }
-    // Step 3 -> 4: Distributor Chart
-    if (loadStep === 3 && (distributorData.length > 0 || !distributorLoading)) {
+    if (loadStep === 3 && (distributorData.length > 0 || !distributorLoading))
       setLoadStep(4);
-    }
-    // Step 4 -> 5: Region Performance
-    if (loadStep === 4 && (regionPerformance?.table_data || !regionLoading)) {
+    if (loadStep === 4 && (regionPerformance?.table_data || !regionFetching))
       setLoadStep(5);
-    }
-    // Step 5 -> 6: Brand Performance
-    if (loadStep === 5 && (brandPerformance?.table_data || !brandLoading)) {
+    if (loadStep === 5 && (brandPerformance?.table_data || !brandFetching))
       setLoadStep(6);
-    }
-    // Step 6 -> 7: Material Group Performance
     if (
       loadStep === 6 &&
-      (materialGroupPerformance?.table_data || !materialLoading)
-    ) {
+      (materialGroupPerformance?.table_data || !materialFetching)
+    )
       setLoadStep(7);
-    }
   }, [
     loadStep,
     summaryData,
@@ -156,12 +140,64 @@ export default function Salesdashboa() {
     distributorData,
     distributorLoading,
     regionPerformance,
-    regionLoading,
+    regionFetching,
     brandPerformance,
-    brandLoading,
+    brandFetching,
     materialGroupPerformance,
-    materialLoading,
+    materialFetching,
   ]);
+
+  // Define sections data for mapping
+  const sections = [
+    {
+      title: "Region",
+      step: 4,
+      isFetching: regionFetching,
+      table: regionPerformance?.table_data ?? [],
+      pie: regionPerformance?.pie_chart ?? [],
+      line: regionPerformance?.line_chart,
+      onRowClick: (row: any) =>
+        setSelectedRegionId((prev) =>
+          prev === String(row.id) ? "" : String(row.id),
+        ),
+    },
+    {
+      title: "Brand",
+      step: 5,
+      isFetching: brandFetching,
+      table: brandPerformance?.table_data ?? [],
+      pie: brandPerformance?.pie_chart ?? [],
+      line: brandPerformance?.line_chart,
+      onRowClick: (row: any) =>
+        setSelectedBrandId((prev) =>
+          prev === String(row.id) ? "" : String(row.id),
+        ),
+    },
+    {
+      title: "Material Group",
+      step: 6,
+      isFetching: materialFetching,
+      table: materialGroupPerformance?.table_data ?? [],
+      pie: materialGroupPerformance?.pie_chart ?? [],
+      line: materialGroupPerformance?.line_chart,
+      onRowClick: (row: any) =>
+        setSelectedMaterialId((prev) =>
+          prev === String(row.id) ? "" : String(row.id),
+        ),
+    },
+    {
+      title: "Customer Segment",
+      step: 7,
+      isFetching: customerFetching,
+      table: customerSegmentPerformance?.table_data ?? [],
+      pie: customerSegmentPerformance?.pie_chart ?? [],
+      line: customerSegmentPerformance?.line_chart,
+      onRowClick: (row: any) =>
+        setSelectedSegmentId((prev) =>
+          prev === String(row.id) ? "" : String(row.id),
+        ),
+    },
+  ];
 
   return (
     <div className="flex flex-1 flex-col lg:px-2 py-4">
@@ -172,7 +208,6 @@ export default function Salesdashboa() {
           <MyForm onFilter={handleFilter} />
         </Card>
 
-        {/* KPI CARDS */}
         <SectionCards
           data={summaryData}
           isLoading={loadStep < 1 && summaryLoading}
@@ -194,7 +229,6 @@ export default function Salesdashboa() {
               />
             )}
           </div>
-
           <div>
             {loadStep < 2 || (monthlyLoading && loadStep === 2) ? (
               <ChartSkeleton />
@@ -209,7 +243,6 @@ export default function Salesdashboa() {
               />
             )}
           </div>
-
           <div>
             <GaugePieChartCard />
           </div>
@@ -227,11 +260,11 @@ export default function Salesdashboa() {
                 data={distributorData}
                 showFilter={true}
                 title="Distributor Target vs Achieved"
-                year={distYear} // ✅ changed
-                month={distMonth || "Apr"} // ✅ changed
+                year={distYear}
+                month={distMonth || "Apr"}
                 sortType={sortType}
-                setYear={setDistYear} // ✅ changed
-                setMonth={setDistMonth} // ✅ changed
+                setYear={setDistYear}
+                setMonth={setDistMonth}
                 setSortType={setSortType}
               />
             )}
@@ -239,44 +272,11 @@ export default function Salesdashboa() {
         </section>
 
         {/* PERFORMANCE SECTIONS */}
-        {[
-          {
-            title: "Region",
-            step: 4,
-            loading: regionLoading,
-            table: regionPerformance?.table_data ?? [],
-            pie: regionPerformance?.pie_chart ?? [],
-            line: regionPerformance?.line_chart,
-          },
-          {
-            title: "Brand",
-            step: 5,
-            loading: brandLoading,
-            table: brandPerformance?.table_data ?? [],
-            pie: brandPerformance?.pie_chart ?? [],
-            line: brandPerformance?.line_chart,
-          },
-          {
-            title: "Material Group",
-            step: 6,
-            loading: materialLoading,
-            table: materialGroupPerformance?.table_data ?? [],
-            pie: materialGroupPerformance?.pie_chart ?? [],
-            line: materialGroupPerformance?.line_chart,
-          },
-          {
-            title: "Customer Segment",
-            step: 7,
-            loading: customerLoading,
-            table: customerSegmentPerformance?.table_data ?? [],
-            pie: customerSegmentPerformance?.pie_chart ?? [],
-            line: customerSegmentPerformance?.line_chart,
-          },
-        ].map((sec) => (
+        {sections.map((sec) => (
           <section key={sec.title}>
             <DataTableSubHeader title={`${sec.title} Performance`} />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-1 mt-4">
-              {loadStep < sec.step || (sec.loading && loadStep === sec.step) ? (
+              {loadStep < sec.step || sec.isFetching ? (
                 <>
                   <TableSkeleton />
                   <PieChartSkeleton />
@@ -287,8 +287,9 @@ export default function Salesdashboa() {
                   <CommonDataTable
                     columns={performanceColumns}
                     data={sec.table}
-                    pageSize={5}
+                    pageSize={10}
                     title={sec.title}
+                    onRowClick={sec.onRowClick}
                   />
                   <RoundedPieChart
                     title={`Sales By ${sec.title} Contribution`}

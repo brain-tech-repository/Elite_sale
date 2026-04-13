@@ -190,12 +190,13 @@ export default function Salesdashboa() {
               data={performance}
               pageSize={5}
               isFetching={perfLoading}
+              height="300px"
             />
             {perfGraphLoading ? (
               <ChartSkeleton />
             ) : (
               <RainbowGlowGradientLineChart
-                height={280}
+                height={230}
                 title={`Monthly ${performanceType === "routes" ? "Route" : "Salesmen"} Performance`}
                 data={performanceGraph?.chart_data || []}
                 xKey="label"
@@ -219,12 +220,13 @@ export default function Salesdashboa() {
               data={expense}
               pageSize={5}
               isFetching={expenseLoading}
+              height="300px"
             />
             {expenseGraphLoading ? (
               <ChartSkeleton />
             ) : (
               <RainbowGlowGradientLineChart
-                height={280}
+                height={230}
                 title="Monthly Expense Trends"
                 data={expenseGraph?.chart_data || []}
                 xKey="label"
