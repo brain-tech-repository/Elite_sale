@@ -26,6 +26,8 @@ export interface SubSurvey {
   survey_name: string;
   from_date: string;
   to_date: string;
+  total_questions: number; // ✅ added
+  total_responses: number;
 }
 
 export interface Category {
