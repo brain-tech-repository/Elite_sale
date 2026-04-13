@@ -5,7 +5,7 @@ import DataTableHeader from "@/components/table-data/data-table-header";
 import DataTableSubHeader from "@/components/table-data/data-table-sub-header";
 import { CommonDataTable } from "@/components/table-data/custom-table";
 import { Card } from "@/components/ui/card";
-import { RoundedPieChart } from "@/components/ui/rounded-pie-chart";
+// import { RoundedPieChart } from "@/components/ui/rounded-pie-chart";
 import { RainbowGlowGradientLineChart } from "@/components/ui/rainbow-glow-gradient-line";
 import { AnimatedHighlightedAreaChart } from "@/components/ui/animated-highlighted-chart";
 /* SKELETON */
@@ -33,6 +33,7 @@ import {
 
 import { GaugePieChartCard } from "@/components/ui/PieChartWithNeedle";
 import { AdvancedBarChart1 } from "@/components/ui/advancebar1";
+import { RoundedPieChart } from "@/components/rounded-pie-charts";
 
 export default function Salesdashboa() {
   const getDefaultFilters = () => {

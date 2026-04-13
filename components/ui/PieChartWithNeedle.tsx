@@ -85,8 +85,8 @@ const renderNeedle = (
 /* ---------------- COMPONENT ---------------- */
 
 export function GaugePieChartCard() {
-  const innerRadius = 60;
-  const outerRadius = 100;
+  const innerRadius = 40;
+  const outerRadius = 80;
 
   return (
     <Card className="shadow-xm h-full flex flex-col pt-3 overflow-hidden">
