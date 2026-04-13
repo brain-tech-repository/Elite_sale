@@ -9,6 +9,9 @@ import {
   MenuItem,
 } from "./types";
 
+const STALE_TIME = 1000 * 60 * 5; // 5 minutes
+const GC_TIME = 1000 * 60 * 30; // 30 minutes
+
 /* ---------------- DASHBOARD ---------------- */
 const getDashboard = async (): Promise<DashboardData> => {
   const res = await api.get<DashboardResponse>("bee-survey-dashboard");
@@ -19,6 +22,9 @@ export const useDashboard = () => {
   return useQuery<DashboardData>({
     queryKey: ["dashboard"],
     queryFn: getDashboard,
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
+    refetchOnWindowFocus: false, // Prevents refetch when switching tabs
   });
 };
 
@@ -39,6 +45,9 @@ export const useMenuSurvey = () => {
         y: 1,
       })),
     }),
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
+    refetchOnWindowFocus: false, // Prevents refetch when switching tabs
   });
 };
 
@@ -80,13 +89,19 @@ export const useSubSurvey = (menuId?: number) => {
           survey_name: item.survey_name,
           from_date: item.from_date,
           to_date: item.to_date,
+          total_questions: item.total_questions, // ✅ added
+          total_responses: item.total_responses, // ✅ added
         })),
       };
     },
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
+    refetchOnWindowFocus: false, // Prevents refetch when switching tabs
   });
 };
 
 /* ---------------- DYNAMIC FILTERED QUESTIONS ---------------- */
+// This hook handles ANY combination of IDs: ?menu_id=X&survey_id=Y&category_id=Z
 const getFilteredQuestions = async (
   menuId?: number,
   surveyId?: number,
@@ -112,9 +127,11 @@ export const useFilteredQuestions = (
     enabled: !!menuId && (!!surveyId || !!categoryId),
     placeholderData: keepPreviousData,
     select: (data) => {
+      // 1. If data is a direct array of questions (Menu 2, 3 or specific filters)
       if (Array.isArray(data) && data.length > 0 && !("questions" in data[0])) {
         return {
           tableData: data.map((q: any) => ({
+            category_name: q.customer_category_name,
             question: q.question,
             type: q.question_type,
             total_responses: q.total_question_response,
@@ -123,6 +140,7 @@ export const useFilteredQuestions = (
         };
       }
 
+      // 2. If data is an array of categories (Menu 1 style)
       if (Array.isArray(data)) {
         return {
           tableData: data.flatMap((cat: any) =>
@@ -137,6 +155,7 @@ export const useFilteredQuestions = (
         };
       }
 
+      // 3. If data is an object with questions inside (Category click)
       const questions = data?.questions || data?.data || [];
       return {
         categoryName: data?.category?.customer_category_name || "Filtered View",
@@ -148,5 +167,8 @@ export const useFilteredQuestions = (
         })),
       };
     },
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
+    refetchOnWindowFocus: false, // Prevents refetch when switching tabs
   });
 };

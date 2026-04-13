@@ -38,6 +38,7 @@ export function SectionCards({ data, isLoading }: Props) {
       message: "Total responses collected",
       color: "bg-gradient-to-r from-[#243748] to-[#4B749F] text-white",
     },
+
     {
       id: "responds",
       title: "Responds",
@@ -47,7 +48,6 @@ export function SectionCards({ data, isLoading }: Props) {
         "bg-gradient-to-r from-[#0F2027] via-[#203A43] to-[#2C5364] text-white",
     },
   ];
-
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-1">
       {cardsData.map((card) => (

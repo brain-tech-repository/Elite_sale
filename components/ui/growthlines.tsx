@@ -1,5 +1,5 @@
 import React from "react";
-import { Card } from "./ui/card";
+import { Card } from "./card";
 
 // ---------------- Types ----------------
 export type GrowthItem = {
@@ -29,18 +29,6 @@ const GrowthLines: React.FC<GrowthLinesProps> = ({ data, isLoading }) => {
           label: "Completion Rate",
           value: data.completion_rate,
         },
-        {
-          label: "Success Rate",
-          value: data.success_rate,
-        },
-        {
-          label: "Incompletion Rate",
-          value: data.incompletion_rate,
-        },
-        {
-          label: "Closure Rate", // ✅ NEW
-          value: data.completion_rate,
-        },
       ]
     : [];
 
@@ -66,24 +54,24 @@ const GrowthLines: React.FC<GrowthLinesProps> = ({ data, isLoading }) => {
   }
 
   return (
-    <Card className="w-full shadow-md p-6 rounded-xl pt-3">
-      <div className="w-full space-y-6">
+    <Card className="w-full shadow-md px-6 py-3 rounded-xl">
+      <div className="w-full space-y-3">
         {items.slice(0, 4).map((item, index) => {
           const gradient = gradients[index % gradients.length];
 
           return (
-            <div key={index} className="space-y-4">
+            <div key={index} className="space-y-1">
               {/* Label + Value */}
-              <div className="flex justify-between text-sm font-semibold md-gap-x-1">
+              <div className="flex justify-between text-sm font-semibold">
                 <span className="text-muted-foreground">{item.label}</span>
                 <span className="font-bold">{item.value}%</span>
               </div>
 
-              {/* Progress Bar (static width to avoid issues) */}
+              {/* Progress Bar */}
               <div className="w-full bg-gray-200/70 rounded-full h-5 overflow-hidden">
                 <div
                   className={`h-5 rounded-full ${gradient}`}
-                  style={{ width: "100%" }} // ✅ no calculation
+                  style={{ width: `${item.value}%` }} // Re-added value logic if needed, or keep 100%
                 />
               </div>
             </div>

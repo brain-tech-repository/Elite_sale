@@ -88,7 +88,7 @@ const data = {
 
         {
           title: "Survey Dashboard",
-          url: "/surveyDashboard",
+          url: "/surveyDashboards",
           icon: Bot,
         },
 
