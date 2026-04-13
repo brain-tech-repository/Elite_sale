@@ -247,7 +247,6 @@ export default function Salesdashboa() {
             onNext={handleLoadMore}
           />
         </section>
-
         <section className="px-2 pb-12">
           <DataTableSubHeader title="Route Efficiency Overview" />
 
