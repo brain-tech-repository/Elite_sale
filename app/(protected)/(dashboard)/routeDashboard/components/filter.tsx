@@ -1,0 +1,298 @@
+"use client";
+
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { toast } from "sonner";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { DateRange } from "react-day-picker";
+
+import { cn } from "@/lib/utils";
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+import { AutoComplete, AutoCompleteOption } from "@/components/ui/autocomplete";
+import {
+  useRegions,
+  useRoutes,
+  useSubregion,
+  useWarehouses,
+} from "../useRoutes";
+
+type Props = {
+  onFilter: (filters: any) => void;
+};
+
+/* =========================
+   SCHEMA
+========================= */
+const formSchema = z.object({
+  dateRange: z
+    .object({
+      from: z.date(),
+      to: z.date(),
+    })
+    .optional(),
+  region: z.string().optional(),
+  sub_region: z.string().optional(),
+  warehouse: z.string().optional(),
+  routes: z.string().optional(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
+
+/* =========================
+   COMPONENT
+========================= */
+
+export default function MyForm({ onFilter }: Props) {
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      dateRange: undefined,
+      region: "",
+      sub_region: "",
+      warehouse: "",
+      routes: "",
+    },
+  });
+
+  /* WATCH VALUES */
+
+  const regionValue = form.watch("region");
+  const subRegionValue = form.watch("sub_region");
+  const warehouseValue = form.watch("warehouse");
+
+  /* API DATA */
+
+  const { data: regions = [] } = useRegions();
+
+  const { data: subRegion = [] } = useSubregion(regionValue);
+
+  const { data: warehouse = [] } = useWarehouses(subRegionValue);
+
+  const { data: routes = [] } = useRoutes(warehouseValue);
+
+  function onSubmit(values: FormValues) {
+    const payload = {
+      fromdate: values.dateRange?.from
+        ? format(values.dateRange.from, "yyyy-MM-dd")
+        : "",
+
+      todate: values.dateRange?.to
+        ? format(values.dateRange.to, "yyyy-MM-dd")
+        : "",
+
+      region_id: values.region || "0",
+      sub_region_id: values.sub_region || "0",
+      warehouse_id: values.warehouse || "0",
+      route_id: values.routes || "0",
+
+      page: 1,
+      length: 10,
+    };
+
+    onFilter(payload); // 🔥 THIS IS MAIN THING
+
+    toast.success("Filters applied successfully!");
+  }
+
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-2 max-w-7xl mx-auto py-1 px-2"
+      >
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
+          {/* ================= Date Range ================= */}
+
+          <FormField
+            control={form.control}
+            name="dateRange"
+            render={({ field }) => {
+              const dateRange = field.value as DateRange | undefined;
+              const isDateSelected = dateRange?.from && dateRange?.to;
+
+              return (
+                <FormItem>
+                  <FormLabel>Date Range</FormLabel>
+
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "pl-3 text-left font-normal shadow-xm w-full",
+                            !dateRange?.from && "text-muted-foreground",
+                          )}
+                        >
+                          {isDateSelected
+                            ? `${format(dateRange.from!, "dd/MM/yy")} - ${format(
+                                dateRange.to!,
+                                "dd/MM/yy",
+                              )}`
+                            : "Pick a date range"}
+
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+
+                    <PopoverContent align="start" className="p-0 w-auto">
+                      <Calendar
+                        mode="range"
+                        selected={dateRange}
+                        onSelect={(range) => field.onChange(range)}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
+          />
+
+          {/* ================= Region ================= */}
+
+          <FormField
+            control={form.control}
+            name="region"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Region</FormLabel>
+
+                <FormControl>
+                  <AutoComplete
+                    options={regions}
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    placeholder="Select Region"
+                    searchPlaceholder="Search region..."
+                    width="w-full"
+                  />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* ================= Sub Region ================= */}
+
+          <FormField
+            control={form.control}
+            name="sub_region"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Sub Region</FormLabel>
+
+                <FormControl>
+                  <AutoComplete
+                    options={subRegion}
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    placeholder="Select Sub Region"
+                    searchPlaceholder="Search sub region..."
+                    width="w-full"
+                  />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* ================= Warehouse ================= */}
+
+          <FormField
+            control={form.control}
+            name="warehouse"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Warehouse</FormLabel>
+
+                <FormControl>
+                  <AutoComplete
+                    options={warehouse}
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    placeholder="Select Warehouse"
+                    searchPlaceholder="Search warehouse..."
+                    width="w-full"
+                  />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* ================= Routes ================= */}
+
+          <FormField
+            control={form.control}
+            name="routes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Routes</FormLabel>
+
+                <FormControl>
+                  <AutoComplete
+                    options={routes}
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    placeholder="Select Route"
+                    searchPlaceholder="Search route..."
+                    width="w-full"
+                  />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* ================= Buttons ================= */}
+
+        <div className="flex gap-6 pt-2">
+          <Button
+            type="submit"
+            className="shadow-xm bg-[#022235] cursor-pointer"
+          >
+            Filter
+          </Button>
+
+          <Button
+            type="button"
+            className="shadow-xm bg-[#022235] cursor-pointer"
+            onClick={() => form.reset()}
+          >
+            Reset
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
+}
