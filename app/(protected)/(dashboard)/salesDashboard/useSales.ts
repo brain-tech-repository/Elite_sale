@@ -133,71 +133,104 @@ export const useMonthlySalesTrend = (
 /* ========================================================================== */
 /* PERFORMANCE ANALYTICS HOOKS                        */
 /* ========================================================================== */
+/* useSales.ts */
 
-export const useRegionPerformance = (filters: any, enabled = true) => {
+// 1. REGION PERFORMANCE
+export const useRegionPerformance = (
+  filters: any,
+  regionId: string = "", // ✅ Default blank string
+  enabled = true,
+) => {
   return useQuery({
-    queryKey: ["region-performance", JSON.stringify(filters)],
+    queryKey: ["region-performance", JSON.stringify(filters), regionId],
     queryFn: async () => {
-      const cleanedParams = Object.fromEntries(
-        Object.entries(filters || {}).filter(
-          ([_, v]) => v !== "" && v !== null && v !== undefined,
-        ),
-      );
-      const res = await fetchPerformance(
-        "get_region_performance",
-        cleanedParams,
-      );
+      const payload = {
+        ...filters,
+        region_id: regionId, // ✅ Explicitly include
+      };
+      // Remove null/undefined but keep the blank string if intended
+      const res = await fetchPerformance("get_region_performance", payload);
       return res?.Result || [];
     },
     enabled: enabled && !!filters,
-    // staleTime: 1000 * 60 * 5,
-    staleTime: 1000 * 60 * 10, // 10 minutes: Consider data fresh for 10 mins
-    gcTime: 1000 * 60 * 15, // 15 minutes: Keep in cache even if unused
+    staleTime: 1000 * 60 * 10,
   });
 };
 
-export const useBrandPerformance = (filters: any, enabled = true) => {
+// 2. BRAND PERFORMANCE
+export const useBrandPerformance = (
+  filters: any,
+  brandId: string = "", // ✅ Default blank string
+  enabled = true,
+) => {
   return useQuery({
-    queryKey: ["brand-performance", JSON.stringify(filters)],
+    queryKey: ["brand-performance", JSON.stringify(filters), brandId],
     queryFn: async () => {
-      const res = await fetchPerformance("get_brand_performance", filters);
+      const payload = {
+        ...filters,
+        brand_id: brandId, // ✅ Explicitly include
+      };
+      const res = await fetchPerformance("get_brand_performance", payload);
       return res?.Result || [];
     },
     enabled: enabled && !!filters,
-    staleTime: 1000 * 60 * 10, // 10 minutes: Consider data fresh for 10 mins
-    gcTime: 1000 * 60 * 15, // 15 minutes: Keep in cache even if unused
+    staleTime: 1000 * 60 * 10,
   });
 };
 
-export const useMaterialGroupPerformance = (filters: any, enabled = true) => {
+// 3. MATERIAL GROUP PERFORMANCE (Already updated, kept for consistency)
+export const useMaterialGroupPerformance = (
+  filters: any,
+  materialTypeId: string = "",
+  enabled = true,
+) => {
   return useQuery({
-    queryKey: ["material-group-performance", JSON.stringify(filters)],
+    queryKey: [
+      "material-group-performance",
+      JSON.stringify(filters),
+      materialTypeId,
+    ],
     queryFn: async () => {
+      const payload = {
+        ...filters,
+        material_type_id: materialTypeId,
+      };
       const res = await fetchPerformance(
         "get_material_group_performance",
-        filters,
+        payload,
       );
       return res?.Result || [];
     },
     enabled: enabled && !!filters,
-    staleTime: 1000 * 60 * 10, // 10 minutes: Consider data fresh for 10 mins
-    gcTime: 1000 * 60 * 15, // 15 minutes: Keep in cache even if unused
+    staleTime: 1000 * 60 * 10,
   });
 };
 
-export const useCustomerSegmentPerformance = (filters: any, enabled = true) => {
+// 4. CUSTOMER SEGMENT PERFORMANCE
+export const useCustomerSegmentPerformance = (
+  filters: any,
+  segmentId: string = "", // ✅ Default blank string
+  enabled = true,
+) => {
   return useQuery({
-    queryKey: ["customer-segment-performance", JSON.stringify(filters)],
+    queryKey: [
+      "customer-segment-performance",
+      JSON.stringify(filters),
+      segmentId,
+    ],
     queryFn: async () => {
+      const payload = {
+        ...filters,
+        customer_segment_id: segmentId, // ✅ Explicitly include
+      };
       const res = await fetchPerformances(
         "get_customer_segment_performance",
-        filters,
+        payload,
       );
       return res?.Result || [];
     },
     enabled: enabled && !!filters,
-    staleTime: 1000 * 60 * 10, // 10 minutes: Consider data fresh for 10 mins
-    gcTime: 1000 * 60 * 15, // 15 minutes: Keep in cache even if unused
+    staleTime: 1000 * 60 * 10,
   });
 };
 

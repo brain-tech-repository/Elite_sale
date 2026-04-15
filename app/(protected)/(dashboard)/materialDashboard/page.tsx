@@ -246,7 +246,7 @@ export default function Salesdashboa() {
             <CommonDataTable
               columns={skuColumns}
               data={activeSkus}
-              pageSize={5}
+              pageSize={10}
               // ✅ UPDATED: Pass fetching state directly to table rows
               isFetching={activeFetching}
             />
@@ -256,7 +256,7 @@ export default function Salesdashboa() {
             <CommonDataTable
               columns={skuColumns}
               data={inactiveSkus}
-              pageSize={5}
+              pageSize={10}
               // ✅ UPDATED: Pass fetching state directly to table rows
               isFetching={inactiveFetching}
             />

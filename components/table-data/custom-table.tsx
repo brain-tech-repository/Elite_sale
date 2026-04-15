@@ -21,7 +21,9 @@ interface Props<T> {
   pageCount?: number;
   serverMode?: boolean;
   title?: string; // Add this line
+  height?: string; // ✅ ADD THIS
   onPaginationChange?: (pagination: any) => void;
+  onRowClick?: (row: T) => void; // ✅ Add this
 }
 
 export function CommonDataTable<T>({
@@ -31,9 +33,11 @@ export function CommonDataTable<T>({
   isFetching = false,
   pageSize = 10,
   pageCount,
+  height,
   serverMode = false,
   title, // Destructure it here
   onPaginationChange,
+  onRowClick, // ✅ Destructure it
 }: Props<T>) {
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
@@ -63,7 +67,11 @@ export function CommonDataTable<T>({
 
   return (
     <>
-      <div className="w-full rounded-2xl border border-gray-200 bg-gradient-to-br from-white via-gray-50 to-gray-100 shadow-sm flex flex-col h-[400px]">
+      <div
+        className="w-full rounded-2xl border border-gray-200 bg-gradient-to-br from-white via-gray-50 to-gray-100 shadow-sm flex flex-col
+       "
+        style={{ height: height || "400px" }}
+      >
         <div className="w-full overflow-x-auto overflow-y-hidden flex-1">
           <div
             className="h-full overflow-y-auto  rounded-t-xl"
@@ -114,7 +122,11 @@ export function CommonDataTable<T>({
                   rows.map((row) => (
                     <tr
                       key={row.id}
-                      className="transition hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50"
+                      // ✅ Add the onClick handler here
+                      onClick={() => onRowClick?.(row.original)}
+                      className={`transition cursor-pointer hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 ${
+                        onRowClick ? "cursor-pointer" : ""
+                      }`}
                     >
                       {row.getVisibleCells().map((cell) => (
                         <td

@@ -8,37 +8,29 @@ export type GrowthItem = {
 };
 
 export interface GrowthLinesProps {
-  data?: any; // raw API response
+  items?: GrowthItem[]; // ✅ dynamic items
   isLoading?: boolean;
 }
 
 // Gradient styles
 const gradients = [
-  "bg-gradient-to-r from-[#0F2027] via-[#203A43] to-[#2C5364]",
-  "bg-gradient-to-r from-[#1E6C8E] to-[#2E7775]",
   "bg-gradient-to-r from-[#243748] to-[#4B749F]",
   "bg-gradient-to-r from-[#134E5E] to-[#71B280]",
+  "bg-gradient-to-r from-[#1E6C8E] to-[#2E7775]",
+  "bg-gradient-to-r from-[#0F2027] via-[#203A43] to-[#2C5364]",
 ];
 
 // ---------------- Component ----------------
-const GrowthLines: React.FC<GrowthLinesProps> = ({ data, isLoading }) => {
+const GrowthLines: React.FC<GrowthLinesProps> = ({ items = [], isLoading }) => {
   // 🔥 Direct mapping (NO parsing)
-  const items: GrowthItem[] = data
-    ? [
-        {
-          label: "Completion Rate",
-          value: data.completion_rate,
-        },
-      ]
-    : [];
 
   if (isLoading) {
     return (
       <Card className="w-full shadow-sm p-6 rounded-xl space-y-6">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="space-y-3">
-            <div className="h-3 w-1/3 bg-gray-200 animate-pulse rounded" />
-            <div className="h-5 w-full bg-gray-200 animate-pulse rounded-full" />
+        {Array.from({ length: 1 }).map((_, i) => (
+          <div key={i} className="space-y-1">
+            <div className="h-2 w-1/3 bg-gray-200 animate-pulse rounded" />
+            <div className="h-3 w-full bg-gray-200 animate-pulse rounded-full" />
           </div>
         ))}
       </Card>
@@ -64,7 +56,7 @@ const GrowthLines: React.FC<GrowthLinesProps> = ({ data, isLoading }) => {
               {/* Label + Value */}
               <div className="flex justify-between text-sm font-semibold">
                 <span className="text-muted-foreground">{item.label}</span>
-                <span className="font-bold">{item.value}%</span>
+                <span className="font-bold">{Number(item.value)}%</span>
               </div>
 
               {/* Progress Bar */}

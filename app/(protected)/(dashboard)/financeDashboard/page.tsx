@@ -8,7 +8,7 @@ import { GaugePieChartCard } from "@/components/ui/PieChartWithNeedle";
 import DataTableSubHeader from "@/components/table-data/data-table-sub-header";
 import { ColumnDef } from "@tanstack/react-table";
 import { CommonDataTable } from "@/components/table-data/custom-table";
-import { RoundedPieChart } from "@/components/rounded-pie-charts";
+
 import LineCharts from "@/components/charts/linechart";
 import LineCharts1 from "@/components/charts/lineChart1";
 import { GlowingRadialChart } from "@/components/ui/glowing-radial-chart";
@@ -21,6 +21,7 @@ import { DuotoneVerticalBarMultipleChart } from "@/components/ui/duotone-bar-mul
 import BarChart from "@/components/ui/BarChart";
 import { AnimatedHighlightedAreaChart } from "@/components/ui/animated-highlighted-chart";
 import { AdvancedBarChart1 } from "@/components/ui/advancebar1";
+import { RoundedPieChart } from "@/components/ui/rounded-pi-charts";
 
 type Sale = {
   id: string;

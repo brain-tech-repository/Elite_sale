@@ -118,7 +118,17 @@ export default function Salesdashboard() {
             <SectionCards data={dashData} isLoading={isDashLoading} />
           </div>
           <div className="lg:col-span-3 flex flex-col justify-center">
-            <GrowthLines data={{ completion_rate: 85.2 }} isLoading={false} />
+            <GrowthLines
+              isLoading={isDashLoading}
+              items={[
+                {
+                  label: "Completion Rate",
+                  value: dashData?.completion_percentage
+                    ? dashData.completion_percentage * 100
+                    : 0,
+                },
+              ]}
+            />
           </div>
         </Card>
       </div>
@@ -190,7 +200,7 @@ export default function Salesdashboard() {
                 data={tableData}
                 pageSize={10}
                 headerTitle={tableTitle}
-                height={940} // Adjusted slightly to match the 3-chart stack height
+                height={550} // Adjusted slightly to match the 3-chart stack height
                 isFetchingMore={isSubLoading || isFilterLoading}
                 key={
                   selectedCategoryId

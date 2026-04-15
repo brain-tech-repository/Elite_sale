@@ -36,7 +36,7 @@ export function DynamicDialog({
 }) {
   return (
     <Dialog open={!!activeModal} onOpenChange={() => setActiveModal(null)}>
-      <DialogContent className="w-[100vw] max-w-none h-[90vh] p-2 flex flex-col">
+      <DialogContent className="w-[50vw] max-w-none  p-2 flex flex-col">
         <DialogHeader>
           <DialogTitle>
             {/* {activeModal ? modalConfig[activeModal].title : ""} */}
@@ -50,7 +50,8 @@ export function DynamicDialog({
               data={modalConfig[activeModal].data}
               isFetching={modalConfig[activeModal].isFetching}
               pagination={{ current_page: 1, total_pages: 1 }}
-              tableHeight="calc(67vh - 120px)"
+              height={"500px"}
+              // tableHeight="calc(67vh - 120px)"
               headerTitle={activeModal ? modalConfig[activeModal].title : ""}
             />
           </div>

@@ -14,7 +14,7 @@ const GC_TIME = 1000 * 60 * 30; // 30 minutes
 
 /* ---------------- DASHBOARD ---------------- */
 const getDashboard = async (): Promise<DashboardData> => {
-  const res = await api.get<DashboardResponse>("bee-survey-dashboard");
+  const res = await api.post<DashboardResponse>("bee-survey-dashboard");
   return res.data.data;
 };
 
@@ -91,6 +91,7 @@ export const useSubSurvey = (menuId?: number) => {
           to_date: item.to_date,
           total_questions: item.total_questions, // ✅ added
           total_responses: item.total_responses, // ✅ added
+          completion_percentage: item.completion_percentage,
         })),
       };
     },

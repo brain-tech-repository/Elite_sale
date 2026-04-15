@@ -11,7 +11,7 @@ import { CommonDataTable } from "@/components/table-data/custom-table";
 import { CommonDataTables } from "@/components/table-data/common-tables";
 import { salesColumns } from "./components/columns";
 import { Card } from "@/components/ui/card";
-import GrowthLines from "@/components/growthlines";
+// import GrowthLines from "@/components/growthlines";
 import { AdvancedBarChart } from "@/components/ui/advancebar";
 import {
   ChartSkeleton,
@@ -37,6 +37,8 @@ import {
 import { routeSalesCollectionColumns } from "./components/column1";
 import { routeExpenseColumns } from "./components/column2";
 import { routeSalesColumns } from "./components/column3";
+import GrowthLines from "@/components/ui/growthlines";
+// import GrowthLines from "@/components/growthlines";
 
 export default function Salesdashboa() {
   // 🔹 Global filters (Charts & Data reset)
@@ -54,6 +56,8 @@ export default function Salesdashboa() {
   // 🔹 Local state for appended data
   const [efficiencyData, setEfficiencyData] = useState<any[]>([]);
   const [salesReportData, setSalesReportData] = useState<any[]>([]);
+  const [selectedPerfRouteId, setSelectedPerfRouteId] = useState<string>("");
+  const [selectedExpRouteId, setSelectedExpRouteId] = useState<string>("");
 
   const currentPage = tableFilters.page ?? 1;
 
@@ -69,7 +73,11 @@ export default function Salesdashboa() {
 
   const handleGlobalFilterChange = (filters: SalesFilterPayload) => {
     setGlobalFilters(filters);
+    setSelectedPerfRouteId(""); // Reset selection on filter change
+    setSelectedExpRouteId(""); // Reset selection on filter change
     setTableFilters((prev) => ({ ...prev, page: 1 }));
+    setGlobalFilters(filters);
+    // setTableFilters((prev) => ({ ...prev, page: 1 }));
     setEfficiencyData([]);
     setSalesReportData([]);
   };
@@ -95,15 +103,23 @@ export default function Salesdashboa() {
     useMonthlyCompareDropSizeVolume(globalFilters);
 
   const { data: performance = [], isLoading: perfLoading } =
-    useRoutePerformance(globalFilters, performanceType);
-  const { data: expense = [], isLoading: expenseLoading } =
-    useRouteExpense(globalFilters);
+    useRoutePerformance(globalFilters, performanceType, selectedPerfRouteId);
 
-  // ✅ FIX: Passing globalFilters to these hooks
-  const { data: performanceGraph, isLoading: perfGraphLoading } =
-    useRoutePerformanceGraph(globalFilters, performanceType);
-  const { data: expenseGraph, isLoading: expenseGraphLoading } =
-    useRouteExpenseGraph(globalFilters);
+  const { data: performanceGraph, isFetching: perfGraphFetching } =
+    useRoutePerformanceGraph(
+      globalFilters,
+      performanceType,
+      selectedPerfRouteId,
+    );
+
+  // Expense
+  const { data: expense = [], isLoading: expenseLoading } = useRouteExpense(
+    globalFilters,
+    selectedExpRouteId,
+  );
+
+  const { data: expenseGraph, isFetching: expenseGraphFetching } =
+    useRouteExpenseGraph(globalFilters, selectedExpRouteId);
 
   const { data: efficiencyRes, isFetching: efficiencyFetching } =
     useRouteEfficiency({ ...globalFilters, ...tableFilters });
@@ -138,20 +154,42 @@ export default function Salesdashboa() {
         <header className="py-4 px-2">
           <DataTableHeader title="Route Dashboard" />
         </header>
-
         <div className="px-2">
           <Card className="shadow-xs lg:px-4 mb-4">
             <MyForm onFilter={handleGlobalFilterChange} />
           </Card>
         </div>
-
         <section className="px-2 mb-6">
           <SectionCards filters={globalFilters} />
         </section>
-
         {/* TOP CHARTS */}
         <section className="grid px-2 lg:pe-6 mb-6 gap-2 grid-cols-1 lg:grid-cols-[20%_40%_40%]">
-          <GrowthLines data={regionData} isLoading={regionLoading} />
+          {/* <GrowthLines data={regionData} isLoading={regionLoading} /> */}
+          <GrowthLines
+            isLoading={regionLoading}
+            items={[
+              {
+                label: "Completion Rate",
+                value: Number(regionData?.completion_rate || 0),
+              },
+              {
+                label: "Success Rate",
+                value: Number(regionData?.success_rate || 0),
+              },
+              {
+                label: "Incompletion Rate",
+                value: Number(
+                  (regionData?.incompletion_rate || "0").replace(/,/g, ""),
+                ),
+              },
+              {
+                label: "Closure Rate",
+                value: Number(
+                  (regionData?.success_rate || "0").replace(/,/g, ""),
+                ),
+              },
+            ]}
+          />
 
           {trendLoading ? (
             <ChartSkeleton />
@@ -172,30 +210,26 @@ export default function Salesdashboa() {
             />
           </div>
         </section>
-
-        {/* PERFORMANCE SECTION */}
+        {/* PERFORMANCE SECTION */}{" "}
         <section className="px-2 mb-6">
-          <div className="mb-4">
-            <DataTableSubHeader title="Route Performance" />
-          </div>
-
-          <Card className="shadow-xs lg:px-2 mb-4">
-            <MyForm1 onTypeChange={handlePerformanceTypeChange} />
-          </Card>
-
-          <div className="grid gap-2 grid-cols-1 lg:grid-cols-2">
+          <DataTableSubHeader title="Route Performance" />{" "}
+          <div className="grid gap-2 grid-cols-1 lg:grid-cols-2 mt-4">
             <CommonDataTable
               title="TOP PERFORMER"
               columns={routeSalesCollectionColumns}
               data={performance}
-              pageSize={5}
               isFetching={perfLoading}
+              height="300px"
+              onRowClick={(row: any) => {
+                const id = String(row.id);
+                setSelectedPerfRouteId((prev) => (prev === id ? "" : id));
+              }}
             />
-            {perfGraphLoading ? (
+            {perfGraphFetching ? (
               <ChartSkeleton />
             ) : (
               <RainbowGlowGradientLineChart
-                height={280}
+                height={230}
                 title={`Monthly ${performanceType === "routes" ? "Route" : "Salesmen"} Performance`}
                 data={performanceGraph?.chart_data || []}
                 xKey="label"
@@ -204,27 +238,26 @@ export default function Salesdashboa() {
             )}
           </div>
         </section>
-
         {/* EXPENSE SECTION */}
         <section className="px-2 mb-6">
-          <div className="mb-4">
-            <DataTableSubHeader title="Route Expense Analysis" />
-          </div>
-
-          <div className="grid gap-2 grid-cols-1 lg:grid-cols-2">
+          <DataTableSubHeader title="Route Expense Analysis" />
+          <div className="grid gap-2 grid-cols-1 lg:grid-cols-2 mt-4">
             <CommonDataTable
-              tableWidth="100%"
               title="Expense By Route"
               columns={routeExpenseColumns}
               data={expense}
-              pageSize={5}
               isFetching={expenseLoading}
+              height="300px"
+              onRowClick={(row: any) => {
+                const id = String(row.id);
+                setSelectedExpRouteId((prev) => (prev === id ? "" : id));
+              }}
             />
-            {expenseGraphLoading ? (
+            {expenseGraphFetching ? (
               <ChartSkeleton />
             ) : (
               <RainbowGlowGradientLineChart
-                height={280}
+                height={230}
                 title="Monthly Expense Trends"
                 data={expenseGraph?.chart_data || []}
                 xKey="label"
@@ -233,7 +266,6 @@ export default function Salesdashboa() {
             )}
           </div>
         </section>
-
         {/* TABLES */}
         <section className="px-2 mb-6">
           <DataTableSubHeader title="Route Wise Sales Report" />
