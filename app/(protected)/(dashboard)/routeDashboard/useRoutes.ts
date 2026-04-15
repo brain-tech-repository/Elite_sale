@@ -197,14 +197,18 @@ export const useMonthlyCompareDropSizeVolume = (filters?: SalesFilterPayload) =>
     refetchOnWindowFocus: false,
   });
 
+//   /* useRoutes.ts */
+
+// 1. Route Performance Table
 export const useRoutePerformance = (
   filters?: SalesFilterPayload,
   type: "routes" | "salesmen" = "routes",
+  routeId: string = "", // ✅ Added
 ) =>
   useQuery({
-    queryKey: ["route-performance", JSON.stringify(filters), type],
+    queryKey: ["route-performance", JSON.stringify(filters), type, routeId], // ✅ Key includes routeId
     queryFn: async () => {
-      const params = serializeFilters(filters);
+      const params = serializeFilters({ ...filters, route_id: routeId }); // ✅ Pass route_id
       const query = new URLSearchParams(params).toString();
       const baseUrl =
         type === "salesmen"
@@ -217,6 +221,7 @@ export const useRoutePerformance = (
       return (
         data?.data?.table_data?.map((item: any) => ({
           route: item.name,
+          id: item.id, // Ensure ID is mapped for clicking
           totalSales: item.total_sales ?? 0,
           totalCollection: item.total_collection ?? 0,
           totalReturn: item.total_return ?? 0,
@@ -224,19 +229,25 @@ export const useRoutePerformance = (
         })) || []
       );
     },
-    staleTime: 1000 * 60 * 5, // Data stays "fresh" for 5 minutes
-    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes even if unused
+    staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
   });
 
+// 2. Route Performance Graph
 export const useRoutePerformanceGraph = (
   filters?: SalesFilterPayload,
   type: "routes" | "salesmen" = "routes",
+  routeId: string = "", // ✅ Added
 ) =>
   useQuery({
-    queryKey: ["route-performance-graph", JSON.stringify(filters), type],
+    queryKey: [
+      "route-performance-graph",
+      JSON.stringify(filters),
+      type,
+      routeId,
+    ],
     queryFn: async () => {
-      const params = serializeFilters(filters);
+      const params = serializeFilters({ ...filters, route_id: routeId });
       const query = new URLSearchParams(params).toString();
       const baseUrl =
         type === "salesmen"
@@ -247,16 +258,19 @@ export const useRoutePerformanceGraph = (
       const { data } = await api.get(url);
       return data?.data || {};
     },
-    staleTime: 1000 * 60 * 5, // Data stays "fresh" for 5 minutes
-    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes even if unused
+    staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
   });
 
-export const useRouteExpense = (filters?: SalesFilterPayload) =>
+// 3. Route Expense Table
+export const useRouteExpense = (
+  filters?: SalesFilterPayload,
+  routeId: string = "",
+) =>
   useQuery({
-    queryKey: ["route-expense", JSON.stringify(filters)],
+    queryKey: ["route-expense", JSON.stringify(filters), routeId],
     queryFn: async () => {
-      const params = serializeFilters(filters);
+      const params = serializeFilters({ ...filters, route_id: routeId });
       const query = new URLSearchParams(params).toString();
       const { data } = await api.get(
         `/route-analysis/expense-analysis?${query}`,
@@ -265,6 +279,7 @@ export const useRouteExpense = (filters?: SalesFilterPayload) =>
       return (
         data?.data?.table_data?.map((item: any) => ({
           route: item.route_name,
+          id: item.id, // Ensure ID is mapped
           totalExpense: item.total_expense ?? 0,
         })) || []
       );
@@ -272,21 +287,21 @@ export const useRouteExpense = (filters?: SalesFilterPayload) =>
     refetchOnWindowFocus: false,
   });
 
-export const useRouteExpenseGraph = (filters?: SalesFilterPayload) =>
+// 4. Route Expense Graph
+export const useRouteExpenseGraph = (
+  filters?: SalesFilterPayload,
+  routeId: string = "",
+) =>
   useQuery({
-    queryKey: ["route-expense-graph", JSON.stringify(filters)],
+    queryKey: ["route-expense-graph", JSON.stringify(filters), routeId],
     queryFn: async () => {
-      const params = serializeFilters(filters);
+      const params = serializeFilters({ ...filters, route_id: routeId });
       const query = new URLSearchParams(params).toString();
-      const url = query
-        ? `/route-analysis/expense-analysis?${query}`
-        : `/route-analysis/expense-analysis`;
+      const url = `/route-analysis/expense-analysis?${query}`;
       const { data } = await api.get(url);
       return data?.data || {};
     },
-
-    staleTime: 1000 * 60 * 5, // Data stays "fresh" for 5 minutes
-    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes even if unused
+    staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
   });
 

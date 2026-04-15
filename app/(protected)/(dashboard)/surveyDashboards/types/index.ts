@@ -2,6 +2,7 @@ export interface DashboardData {
   total_menu_survey: number;
   total_sub_survey: number;
   total_responds: number;
+  completion_percentage: number; // ✅ add this
 }
 
 export interface DashboardResponse {
@@ -28,6 +29,7 @@ export interface SubSurvey {
   to_date: string;
   total_questions: number; // ✅ added
   total_responses: number;
+  completion_percentage: Number;
 }
 
 export interface Category {

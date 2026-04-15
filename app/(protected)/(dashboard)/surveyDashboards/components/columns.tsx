@@ -6,6 +6,7 @@ export const surveyColumns: ColumnDef<any>[] = [
     accessorKey: "survey_name",
     header: "Survey Name", // ✅ updated label
   },
+
   {
     accessorKey: "from_date",
     header: "From Date",
@@ -21,6 +22,10 @@ export const surveyColumns: ColumnDef<any>[] = [
   {
     accessorKey: "total_responses",
     header: "Total Responses",
+  },
+  {
+    accessorKey: "completion_percentage",
+    header: "Completion Rate", // ✅ updated label
   },
 ];
 

@@ -118,7 +118,17 @@ export default function Salesdashboard() {
             <SectionCards data={dashData} isLoading={isDashLoading} />
           </div>
           <div className="lg:col-span-3 flex flex-col justify-center">
-            <GrowthLines data={{ completion_rate: 85.2 }} isLoading={false} />
+            <GrowthLines
+              isLoading={isDashLoading}
+              items={[
+                {
+                  label: "Completion Rate",
+                  value: dashData?.completion_percentage
+                    ? dashData.completion_percentage * 100
+                    : 0,
+                },
+              ]}
+            />
           </div>
         </Card>
       </div>
