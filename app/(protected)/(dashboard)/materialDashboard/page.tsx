@@ -187,18 +187,21 @@ export default function Salesdashboa() {
                   xKey="label"
                   yKey="y"
                   title="Daily"
+                  height={260}
                 />
                 <AnimatedHighlightedAreaChart
                   data={volumeGrowth.monthly}
                   xKey="label"
                   yKey="y"
                   title="Monthly"
+                  height={260}
                 />
                 <RainbowGlowGradientLineChart
                   data={volumeGrowth.yearly}
                   xKey="label"
                   yKey="y"
                   title="Yearly"
+                  height={260}
                 />
               </>
             )}
@@ -221,18 +224,21 @@ export default function Salesdashboa() {
                   xKey="label"
                   yKey="y"
                   title="Daily"
+                  height={260}
                 />
                 <AnimatedHighlightedAreaChart
                   data={valueGrowth.monthly}
                   xKey="label"
                   yKey="y"
                   title="Monthly"
+                  height={260}
                 />
                 <RainbowGlowGradientLineChart
                   data={valueGrowth.yearly}
                   xKey="label"
                   yKey="y"
                   title="Yearly"
+                  height={260}
                 />
               </>
             )}

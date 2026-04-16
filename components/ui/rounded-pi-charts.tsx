@@ -25,6 +25,7 @@ interface RoundedPieChartProps {
   title?: string;
   description?: string;
   data?: PieItem[];
+  height?: number | string;
 }
 
 const RADIAN = Math.PI / 180;
@@ -62,13 +63,13 @@ const renderSmartLabel = (props: any) => {
     : window.__labelYCoords.left;
 
   let adjustedY = my;
-  const minGap = 16; // Enough space for font size 11-12
+  const minGap = 14; // Enough space for font size 11-12
 
   // The fix for "Top Side": If the label is in the top half (my < cy),
   // we push UP to keep it from drowning in the pie.
   list.forEach((prevY: number) => {
     if (Math.abs(adjustedY - prevY) < minGap) {
-      adjustedY = my < cy ? prevY - minGap : prevY + minGap;
+      adjustedY = prevY + (my < cy ? -10 : 10); // reduce shift
     }
   });
   list.push(adjustedY);
@@ -106,6 +107,7 @@ declare global {
 export function RoundedPieChart({
   title = "Sales Contribution",
   description = "Distribution",
+  height = 320,
   data = [],
 }: RoundedPieChartProps) {
   // 1. Expand your color palette to ensure more variety
@@ -161,10 +163,9 @@ export function RoundedPieChart({
 
   return (
     <Card className="flex flex-col shadow-sm py-3">
-      <CardHeader className="items-center pb-0">
-        <CardTitle className="text-sm">{title}</CardTitle>
+      <CardHeader className="flex flex-row items-start justify-between">
+        <CardTitle className=" text-sm">{title}</CardTitle>
       </CardHeader>
-
       <CardContent className="flex flex-col items-center p-0">
         {chartData.length === 0 ? (
           <div className="h-[200px] flex items-center justify-center text-gray-400 text-sm">
@@ -173,7 +174,8 @@ export function RoundedPieChart({
         ) : (
           <ChartContainer
             config={chartConfig}
-            className="mx-auto w-full lg:h-[246px]"
+            className="mx-auto w-full pt-0"
+            style={{ height }}
           >
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -190,7 +192,7 @@ export function RoundedPieChart({
                   paddingAngle={4}
                   labelLine={false}
                   label={renderSmartLabel}
-                  cy="45%"
+                  cy="50%"
                   isAnimationActive={false} // Prevents label jumping
                 >
                   {/* 🔥 This ensures every part uses its pre-assigned color from chartData */}
@@ -210,7 +212,7 @@ export function RoundedPieChart({
               <button
                 key={item.name}
                 onClick={() => toggleItem(item.name)}
-                className={`flex items-center gap-2 text-sm transition  ${
+                className={`flex items-center gap-2 text-xs transition  ${
                   isHidden ? "opacity-40" : "opacity-100"
                 }`}
               >

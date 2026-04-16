@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Loader2 } from "lucide-react";
 import { DateRange } from "react-day-picker";
 
 import { cn } from "@/lib/utils";
@@ -29,6 +29,12 @@ import {
   SalesFilterPayload,
   salesFilterSchema,
 } from "../types";
+import {
+  useWarehouses,
+  useMaterialTypes,
+  useBrands,
+  useMaterials,
+} from "../useCustomers";
 
 type Props = {
   onFilter: (filters: SalesFilterPayload) => void;
@@ -41,28 +47,22 @@ export default function MyForm({ onFilter }: Props) {
       dateRange: undefined,
       warehouse: "",
       brand_id: "",
-      material_type: "", // Updated name
+      material_type: "",
       material: "",
     },
   });
 
-  /* MOCK DATA */
-  const warehouses = [
-    { label: "Warehouse A", value: "1" },
-    { label: "Warehouse B", value: "2" },
-  ];
-  const types = [
-    { label: "Type 1", value: "1" },
-    { label: "Type 2", value: "2" },
-  ];
-  const brands = [
-    { label: "Brand A", value: "1" },
-    { label: "Brand B", value: "2" },
-  ];
-  const materials = [
-    { label: "Material X", value: "1" },
-    { label: "Material Y", value: "2" },
-  ];
+  // Watch values to trigger dependent queries
+  const selectedMaterialType = form.watch("material_type");
+  const selectedBrand = form.watch("brand_id");
+
+  // Fetching Data
+  const { data: warehouses = [], isLoading: isLoadingWh } = useWarehouses();
+  const { data: types = [], isLoading: isLoadingTypes } = useMaterialTypes();
+  const { data: brands = [], isLoading: isLoadingBrands } =
+    useBrands(selectedMaterialType);
+  const { data: materials = [], isLoading: isLoadingMaterials } =
+    useMaterials(selectedBrand);
 
   function onSubmit(values: SalesFilterFormValues) {
     if (!values.dateRange?.from || !values.dateRange?.to) {
@@ -75,7 +75,7 @@ export default function MyForm({ onFilter }: Props) {
       todate: format(values.dateRange.to, "yyyy-MM-dd"),
       warehouse_id: values.warehouse || "",
       brand_id: values.brand_id || "",
-      material_type_id: values.material_type || "", // Mapping updated
+      material_type_id: values.material_type || "",
       material_id: values.material || "",
     };
 
@@ -94,45 +94,42 @@ export default function MyForm({ onFilter }: Props) {
           <FormField
             control={form.control}
             name="dateRange"
-            render={({ field }) => {
-              const dateRange = field.value as DateRange | undefined;
-              return (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Date Range</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "pl-3 text-left font-normal w-full",
-                          !dateRange?.from && "text-muted-foreground",
-                        )}
-                      >
-                        {dateRange?.from ? (
-                          dateRange.to ? (
-                            `${format(dateRange.from, "dd/MM/yy")} - ${format(dateRange.to, "dd/MM/yy")}`
-                          ) : (
-                            format(dateRange.from, "dd/MM/yy")
-                          )
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Date Range</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "pl-3 text-left font-normal w-full",
+                        !field.value?.from && "text-muted-foreground",
+                      )}
+                    >
+                      {field.value?.from ? (
+                        field.value.to ? (
+                          `${format(field.value.from, "dd/MM/yy")} - ${format(field.value.to, "dd/MM/yy")}`
                         ) : (
-                          <span>Pick a date range</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent align="start" className="p-0 w-auto">
-                      <Calendar
-                        mode="range"
-                        selected={dateRange}
-                        onSelect={field.onChange}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              );
-            }}
+                          format(field.value.from, "dd/MM/yy")
+                        )
+                      ) : (
+                        <span>Pick a date range</span>
+                      )}
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent align="start" className="p-0 w-auto">
+                    <Calendar
+                      mode="range"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
           />
 
           {/* WAREHOUSE */}
@@ -144,7 +141,7 @@ export default function MyForm({ onFilter }: Props) {
                 <FormLabel>Warehouse</FormLabel>
                 <AutoComplete
                   options={warehouses}
-                  value={field.value ?? ""} // Fixes "undefined" error
+                  value={field.value ?? ""}
                   onChange={field.onChange}
                   placeholder="Select warehouse"
                 />
@@ -161,9 +158,14 @@ export default function MyForm({ onFilter }: Props) {
               <FormItem>
                 <FormLabel>Material Type</FormLabel>
                 <AutoComplete
+                  enableSelectAll={true}
                   options={types}
-                  value={field.value ?? ""} // Fixes "undefined" error
-                  onChange={field.onChange}
+                  value={field.value ?? ""}
+                  onChange={(val) => {
+                    field.onChange(val);
+                    form.setValue("brand_id", ""); // Reset dependent fields
+                    form.setValue("material", "");
+                  }}
                   placeholder="Select type"
                 />
                 <FormMessage />
@@ -179,10 +181,17 @@ export default function MyForm({ onFilter }: Props) {
               <FormItem>
                 <FormLabel>Brand</FormLabel>
                 <AutoComplete
+                  enableSelectAll={true}
                   options={brands}
+                  disabled={!selectedMaterialType}
                   value={field.value ?? ""}
-                  onChange={field.onChange}
-                  placeholder="Select brand"
+                  onChange={(val) => {
+                    field.onChange(val);
+                    form.setValue("material", ""); // Reset dependent field
+                  }}
+                  placeholder={
+                    selectedMaterialType ? "Select brand" : "Select type first"
+                  }
                 />
                 <FormMessage />
               </FormItem>
@@ -197,10 +206,14 @@ export default function MyForm({ onFilter }: Props) {
               <FormItem>
                 <FormLabel>Material</FormLabel>
                 <AutoComplete
+                  enableSelectAll={true}
                   options={materials}
+                  disabled={!selectedBrand}
                   value={field.value ?? ""}
                   onChange={field.onChange}
-                  placeholder="Select material"
+                  placeholder={
+                    selectedBrand ? "Select material" : "Select brand first"
+                  }
                 />
                 <FormMessage />
               </FormItem>
@@ -211,13 +224,14 @@ export default function MyForm({ onFilter }: Props) {
         <div className="flex gap-x-4">
           <Button
             type="submit"
-            className=" text-white  bg-[#022235] cursor-pointer"
+            className="text-white bg-[#022235] hover:bg-[#033350]"
           >
             Filter
           </Button>
           <Button
-            type="submit"
-            className=" text-white  bg-[#022235] cursor-pointer"
+            type="button"
+            variant="outline"
+            className="border-[#022235] text-[#022235]"
             onClick={() => form.reset()}
           >
             Reset

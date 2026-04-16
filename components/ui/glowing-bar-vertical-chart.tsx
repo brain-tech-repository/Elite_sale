@@ -34,10 +34,10 @@ const regionColorMap: Record<string, string> = {
   "mid west": "#1f77b4",
   "north west": "#bcbd22  ",
   "south west": "#072246 ",
-  nile: "#d62728",
-  CENTRAL: "#8344bd",
+  nile: "#a7ee74",
+  CENTRAL: "#213e88",
   central: "#0e6c79", // ✅ FIXED
-  albertine: "#ad269b",
+  albertine: "#1a503a",
   "west nile": "#7f7f7f",
   east: "#3fa880",
   north: "#17becf",
@@ -148,7 +148,7 @@ export function GlowingBarVerticalChart({ data = [], regions = [] }: Props) {
               margin={{ left: 10, right: 10, top: 40, bottom: 10 }}
             >
               <YAxis
-                width={80}
+                width={105}
                 type="category"
                 dataKey="category"
                 tickLine={false}
@@ -175,7 +175,7 @@ export function GlowingBarVerticalChart({ data = [], regions = [] }: Props) {
                 <Bar
                   key={region}
                   stackId="a"
-                  barSize={12}
+                  barSize={18}
                   dataKey={region}
                   // NEW: Pass the hide prop conditionally based on state
                   hide={hiddenRegions.includes(region)}

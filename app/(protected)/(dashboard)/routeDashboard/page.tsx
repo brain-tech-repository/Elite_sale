@@ -229,7 +229,7 @@ export default function Salesdashboa() {
               <ChartSkeleton />
             ) : (
               <RainbowGlowGradientLineChart
-                height={230}
+                height={250}
                 title={`Monthly ${performanceType === "routes" ? "Route" : "Salesmen"} Performance`}
                 data={performanceGraph?.chart_data || []}
                 xKey="label"
@@ -257,7 +257,7 @@ export default function Salesdashboa() {
               <ChartSkeleton />
             ) : (
               <RainbowGlowGradientLineChart
-                height={230}
+                height={250}
                 title="Monthly Expense Trends"
                 data={expenseGraph?.chart_data || []}
                 xKey="label"

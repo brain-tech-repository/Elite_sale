@@ -287,19 +287,22 @@ export default function Salesdashboa() {
                   <CommonDataTable
                     columns={performanceColumns}
                     data={sec.table}
-                    pageSize={10}
+                    pageSize={5}
                     title={sec.title}
                     onRowClick={sec.onRowClick}
+                    height="380px"
                   />
                   <RoundedPieChart
                     title={`Sales By ${sec.title} Contribution`}
                     data={sec.pie}
+                    height={250}
                   />
                   <RainbowGlowGradientLineChart
                     xKey="label"
                     yKey="y"
                     title={`${sec.title} Monthly Sales Trend`}
                     data={sec.line || []}
+                    height={330}
                   />
                 </>
               )}
