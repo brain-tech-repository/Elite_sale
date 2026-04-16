@@ -7,7 +7,11 @@ import MyForm from "./components/filter";
 import { Card } from "@/components/ui/card";
 import DataTableHeader from "@/components/table-data/data-table-header";
 import { performanceColumns } from "./components/columns";
-import { useStockLedgerReport } from "./useCustomers"; // ✅ Import hook
+import { useStockLedgerReport } from "./useCustomers";
+import { RowDetailsModal } from "./components/RowDetailModal";
+import { exportToCSV } from "@/lib/export";
+
+// Import the new extracted component
 
 export default function CustomerDashboard() {
   const [globalFilters, setGlobalFilters] = useState<SalesFilterPayload>({
@@ -20,48 +24,26 @@ export default function CustomerDashboard() {
   });
 
   const [showTable, setShowTable] = useState(false);
+  const [selectedRow, setSelectedRow] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  /* =========================
-      API INTEGRATION
-  ========================= */
-  const {
-    data: reportResponse,
-    isFetching,
-    refetch,
-  } = useStockLedgerReport(globalFilters);
-
+  const { data: reportResponse, isFetching } =
+    useStockLedgerReport(globalFilters);
   const allData = reportResponse?.data || [];
 
-  const handleExport = () => {
-    if (allData.length === 0) return;
-
-    const headers = Object.keys(allData[0]).join(",");
-    const rows = allData
-      .map((row: any) =>
-        Object.values(row)
-          .map((val) => `"${val}"`)
-          .join(","),
-      )
-      .join("\n");
-
-    const csv = `${headers}\n${rows}`;
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `stock_report_${globalFilters.fromdate}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleExportAll = () => {
+    const dateStr = globalFilters.fromdate || "report";
+    exportToCSV(allData, `stock_report_${dateStr}`);
   };
 
-  /* =========================
-      HANDLERS
-  ========================= */
   const handleFilterChange = (f: SalesFilterPayload) => {
     setGlobalFilters(f);
     setShowTable(true);
-    // TanStack Query will automatically refetch because globalFilters (the queryKey) changed
+  };
+
+  const handleRowClick = (rowData: any) => {
+    setSelectedRow(rowData);
+    setIsModalOpen(true);
   };
 
   return (
@@ -71,14 +53,12 @@ export default function CustomerDashboard() {
           <DataTableHeader title="Stock Ledger Report" />
         </header>
 
-        {/* Filter Section */}
         <div className="px-2 mb-4">
           <Card className="shadow-xm lg:px-5">
             <MyForm onFilter={handleFilterChange} />
           </Card>
         </div>
 
-        {/* Table Section */}
         <section className="px-2 pb-12">
           {!showTable ? (
             <div className="text-center py-10 text-gray-500">
@@ -88,22 +68,22 @@ export default function CustomerDashboard() {
             <CommonDataTables
               columns={performanceColumns}
               data={allData}
-              headerTitle={
-                reportResponse?.total_closing_value
-                  ? `Stock Ledger Table (Total Closing: ${reportResponse.total_closing_value})`
-                  : "Stock Ledger Table"
-              }
-              pagination={undefined}
-              onNext={() => {}}
-              onPrev={() => {}}
-              isFetching={isFetching} // ✅ Shows loading state during API calls
-              isFetchingMore={false}
+              headerTitle={"Stock Ledger Table"}
+              isFetching={isFetching}
               onFilter={handleFilterChange}
-              onExport={handleExport}
+              onExport={handleExportAll}
+              onRowClick={handleRowClick}
             />
           )}
         </section>
       </div>
+
+      {/* Extracted Modal Component */}
+      <RowDetailsModal
+        isOpen={isModalOpen}
+        onClose={setIsModalOpen}
+        selectedRow={selectedRow}
+      />
     </div>
   );
 }

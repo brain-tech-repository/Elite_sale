@@ -5,21 +5,23 @@ const formatNumber = (value: any) => {
   if (value === null || value === undefined || value === "") return "0";
   const num = parseFloat(String(value).replace(/,/g, ""));
   if (isNaN(num)) return "0";
-  return Math.floor(num).toLocaleString("en-IN");
+
+  // Changed to "en-US" to format as 1,048,775,838
+  return Math.floor(num).toLocaleString("en-US");
 };
 
 // Define types for visibility mapping
 type MultipleUOMMap = Record<string, string>;
 
-// ✅ Sum helper
+//  Restored Sum helper to calculate totals properly
 const sumColumn = (data: any[], key: string) => {
   return data.reduce((acc, row) => {
-    const val = parseFloat(row[key]) || 0;
+    // Strip commas before parsing just in case the raw data has them
+    const val = parseFloat(String(row[key]).replace(/,/g, "")) || 0;
     return acc + val;
   }, 0);
 };
 
-// ❌ REMOVE footer from common number columns
 const createNumberColumn = (
   key: string,
   label: string,
@@ -41,7 +43,7 @@ const multipleUOMMap: MultipleUOMMap = {
 };
 
 export const performanceColumns: ColumnDef<PerformanceRow>[] = [
-  // ✅ Material Code with "Total"
+  //  Material Code with "Total"
   {
     accessorKey: "material_code",
     header: "Material Code",
@@ -65,7 +67,7 @@ export const performanceColumns: ColumnDef<PerformanceRow>[] = [
   createNumberColumn("issued_qty", "Issued Qty"),
   createNumberColumn("closing_qty", "Closing Qty"),
 
-  // ✅ ONLY THIS COLUMN HAS TOTAL
+  //  ONLY THIS COLUMN HAS TOTAL
   {
     accessorKey: "closing_value",
     header: "Closing Value",
@@ -73,6 +75,7 @@ export const performanceColumns: ColumnDef<PerformanceRow>[] = [
     cell: ({ row }) => formatNumber(row.original.closing_value),
 
     footer: ({ table }) => {
+      //  Uncommented and calculating total dynamically using the restored helper
       const total = sumColumn(table.options.data, "closing_value");
 
       return <div className="font-bold text-center">{formatNumber(total)}</div>;
@@ -81,7 +84,7 @@ export const performanceColumns: ColumnDef<PerformanceRow>[] = [
 
   createNumberColumn("packing_size", "Packing Size"),
 
-  // 🔥 Complex column (unchanged)
+  //  Complex column (unchanged)
   {
     id: COMPLEX_HEADER_ID,
     header: () => (

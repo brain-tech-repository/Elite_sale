@@ -32,6 +32,7 @@ interface CommonTableProps<TData, TValue> {
   tableHeight?: number | string;
   onExport?: () => void; // ✅ add here
   height?: number | string; // ✅ ADD THIS
+  onRowClick?: (rowData: TData) => void;
   FilterComponent?: React.ComponentType<{
     onFilter: (filters: any) => void;
   }>;
@@ -49,6 +50,7 @@ export function CommonDataTables<TData, TValue>({
   isFetchingMore,
   FilterComponent,
   onExport, // ✅ ADD THIS
+  onRowClick,
   height,
   tableHeight = 300,
 }: CommonTableProps<TData, TValue>) {
@@ -112,35 +114,6 @@ export function CommonDataTables<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
   });
 
-  // const hasMore =
-  //   isFetchingMore ||
-  //   pagination?.current_page < pagination?.total_pages ||
-  //   pagination?.current_page < pagination?.last_page;
-
-  // const handleExport = () => {
-  //   const rows = table.getRowModel().rows;
-
-  //   const exportData = rows.map((row) => row.original);
-
-  //   console.log("Export Data:", exportData);
-
-  //   // Simple CSV export
-  //   const csv = [
-  //     Object.keys(exportData[0] || {}).join(","), // headers
-  //     ...exportData.map((row) => Object.values(row as any).join(",")),
-  //   ].join("\n");
-
-  //   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  //   const url = URL.createObjectURL(blob);
-
-  //   const link = document.createElement("a");
-  //   link.href = url;
-  //   link.setAttribute("download", "table_data.csv");
-  //   document.body.appendChild(link);
-  //   link.click();
-  //   document.body.removeChild(link);
-  // };
-
   const hasMore = pagination?.current_page < pagination?.total_pages;
 
   return (
@@ -177,6 +150,7 @@ export function CommonDataTables<TData, TValue>({
             table={table}
             columnsLength={columns.length}
             isFetching={isFetching || (isFetchingMore && data.length === 0)}
+            onRowClick={onRowClick}
           />
           <tfoot>
             {table.getFooterGroups().map((footerGroup) => (

@@ -28,6 +28,7 @@
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.35.0",
+    "leaflet": "^1.9.4",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.575.0",
     "next": "16.1.6",
@@ -40,6 +41,7 @@
     "react-hook-form": "^7.71.2",
     "react-infinite-scroll-component": "^6.1.1",
     "react-intersection-observer": "^10.0.3",
+    "react-leaflet": "^5.0.0",
     "recharts": "^2.15.4",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
@@ -49,6 +51,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.1",
+    "@types/leaflet": "^1.9.21",
     "@types/node": "^20.19.35",
     "@types/react": "^19",
     "@types/react-dom": "^19",
