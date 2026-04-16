@@ -70,7 +70,7 @@ export function CommonDataTable<T>({
       <div
         className="w-full rounded-2xl border border-gray-200 bg-gradient-to-br from-white via-gray-50 to-gray-100 shadow-sm flex flex-col
        "
-        style={{ height: height || "400px" }}
+        style={{ height: height || "420px" }}
       >
         <div className="w-full overflow-x-auto overflow-y-hidden flex-1">
           <div

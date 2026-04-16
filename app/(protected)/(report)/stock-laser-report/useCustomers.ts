@@ -1,184 +1,96 @@
+import { useQuery } from "@tanstack/react-query";
+// import api from "@/utils/api"; // ✅ Use your custom client
+import { ApiResponse, Warehouse, MaterialType, Brand, Material } from "./types";
 import api from "@/lib/apiClient";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { StockLedgerResponse, SalesFilterPayload } from "./types";
 
-import { SelectOption, SalesFilterPayload } from "./types";
-import { ApiResponse } from "../../(dashboard)/customerDashboard/types";
+/**
+ * NOTE: Since your `api` client uses a baseURL, we only use the relative paths here.
+ * Paths: /warehouse, /material-type, /brand, /material
+ */
 
-/* ========================================================================== */
-/*                              HELPER FUNCTION                               */
-/* ========================================================================== */
-
-const mapOptions = (data: ApiResponse<any[]>): SelectOption[] => {
-  if (!data?.data) return [];
-
-  return data.data.map((item: any) => ({
-    value: String(item.id),
-    label:
-      item.region_name ??
-      item.warehouse_name ??
-      item.sales_area_name ??
-      item.route_name ??
-      "Unknown",
-  }));
-};
-
-/* ========================================================================== */
-/*                               MASTER FETCHER                               */
-/* ========================================================================== */
-
-const fetchMaster = async (
-  endpoint: string,
-  params: Record<string, string> = {},
-) => {
-  const filteredParams = Object.fromEntries(
-    Object.entries(params).filter(([_, value]) => value),
-  );
-  const query = new URLSearchParams(filteredParams).toString();
-  const url = query ? `${endpoint}?${query}` : endpoint;
-  const { data } = await api.get(url);
-  return data;
-};
-
-/* ========================================================================== */
-/*                           FILTER DROPDOWN HOOKS                            */
-/* ========================================================================== */
-
-/* REGIONS */
-
-export const useRegions = () =>
-  useQuery<SelectOption[]>({
-    queryKey: ["regions"],
-
+export const useWarehouses = () => {
+  return useQuery({
+    queryKey: ["warehouses"],
     queryFn: async () => {
-      const data = await fetchMaster("/dashboard/customer/filters/regions");
-
-      return mapOptions(data);
+      const { data } = await api.get<ApiResponse<Warehouse>>("/warehouse");
+      return data.data.map((w) => ({
+        label: w.warehouse_name,
+        value: String(w.id),
+      }));
     },
-
-    staleTime: 1000 * 60 * 5,
-    refetchOnWindowFocus: false,
   });
+};
 
-/* WAREHOUSES */
-
-export const useWarehouses = (regionId?: string) =>
-  useQuery<SelectOption[]>({
-    queryKey: ["warehouses", regionId],
-
+export const useMaterialTypes = () => {
+  return useQuery({
+    queryKey: ["material-types"],
     queryFn: async () => {
-      const data = await fetchMaster("/dashboard/customer/filters/warehouses", {
-        region_id: regionId || "",
+      const { data } =
+        await api.get<ApiResponse<MaterialType>>("/material-type");
+      return data.data.map((t) => ({
+        label: t.type,
+        value: String(t.id),
+      }));
+    },
+  });
+};
+
+// Update the parameter type to include undefined
+export const useBrands = (typeIds: string | undefined) => {
+  return useQuery({
+    queryKey: ["brands", typeIds],
+    enabled: !!typeIds, // Query only runs if typeIds is truthy
+    queryFn: async () => {
+      // TypeScript now knows typeIds is a string here because of enabled check
+      const { data } = await api.post<ApiResponse<Brand>>("/brand", {
+        type: typeIds,
       });
-      return mapOptions(data);
+      return data.data.map((b) => ({
+        label: b.brand_name || `Brand ${b.id}`,
+        value: String(b.id),
+      }));
     },
-    enabled: !!regionId,
-    refetchOnWindowFocus: false,
   });
+};
 
-/* SALES AREAS */
-
-export const useSalesAreas = (warehouseId?: string) =>
-  useQuery<SelectOption[]>({
-    queryKey: ["sales-areas", warehouseId],
-
+export const useMaterials = (brandIds: string | undefined) => {
+  return useQuery({
+    queryKey: ["materials", brandIds],
+    enabled: !!brandIds,
     queryFn: async () => {
-      const data = await fetchMaster(
-        "/dashboard/customer/filters/sales-areas",
-        { warehouse_id: warehouseId || "" },
+      const { data } = await api.post<ApiResponse<Material>>("/material", {
+        brand: brandIds,
+      });
+      return data.data.map((m) => ({
+        label: m.material_name,
+        value: String(m.id),
+      }));
+    },
+  });
+};
+
+export const useStockLedgerReport = (payload: SalesFilterPayload) => {
+  return useQuery({
+    queryKey: ["stock-ledger", payload],
+    queryFn: async () => {
+      // Mapping the internal form names to the specific API keys required by the stock-ledger-report endpoint
+      const apiPayload = {
+        warehouse: payload.warehouse_id,
+        material: payload.material_id,
+        brand: payload.brand_id,
+        type: payload.material_type_id,
+        fromdate: payload.fromdate,
+        todate: payload.todate,
+      };
+
+      const { data } = await api.post<StockLedgerResponse>(
+        "/stock-ledger-report",
+        apiPayload,
       );
-
-      return mapOptions(data);
-    },
-
-    enabled: !!warehouseId,
-    refetchOnWindowFocus: false,
-  });
-
-/* ROUTES */
-
-export const useRoutes = (salesAreaId?: string) =>
-  useQuery<SelectOption[]>({
-    queryKey: ["routes", salesAreaId],
-
-    queryFn: async () => {
-      const data = await fetchMaster("/dashboard/customer/filters/routes", {
-        sales_area_id: salesAreaId || "",
-      });
-
-      return mapOptions(data);
-    },
-
-    enabled: !!salesAreaId,
-    refetchOnWindowFocus: false,
-  });
-
-/* ========================================================================== */
-/*                             DASHBOARD SUMMARY                              */
-/* ========================================================================== */
-
-export const useDashboardSummary = (filters?: SalesFilterPayload) =>
-  useQuery({
-    queryKey: ["customer-summary", filters],
-
-    queryFn: async () => {
-      const query = new URLSearchParams(
-        (filters ?? {}) as Record<string, string>,
-      ).toString();
-
-      const { data } = await api.get(`/dashboard/customer/summary?${query}`);
-
       return data;
     },
-
-    refetchOnWindowFocus: false,
+    // Only run the query if we have a valid date range
+    enabled: !!payload.fromdate && !!payload.todate,
   });
-
-/* ========================================================================== */
-/*                              MONTHLY TREND                                 */
-/* ========================================================================== */
-
-export const useMonthlyTrend = (filters?: SalesFilterPayload) =>
-  useQuery({
-    queryKey: ["customer-monthly-trend", filters],
-
-    queryFn: async () => {
-      const query = new URLSearchParams(
-        (filters ?? {}) as Record<string, string>,
-      ).toString();
-
-      const { data } = await api.get(
-        `/dashboard/customer/monthly-trend?${query}`,
-      );
-
-      // ✅ direct return (no mapping)
-      return data?.data || [];
-    },
-
-    refetchOnWindowFocus: false,
-  });
-
-export const useTopCustomersTable = (
-  filters?: SalesFilterPayload & {
-    page?: number;
-    length?: number;
-  },
-) =>
-  useQuery({
-    queryKey: ["top-customers-table", filters],
-
-    queryFn: async () => {
-      const query = new URLSearchParams(
-        (filters ?? {}) as Record<string, string>,
-      ).toString();
-
-      const { data } = await api.get(`/top-customers-table?${query}`);
-
-      return {
-        tableData: data?.data || [],
-        pagination: data?.pagination || {},
-      };
-    },
-
-    placeholderData: keepPreviousData, // ✅ correct
-    refetchOnWindowFocus: false,
-  });
+};

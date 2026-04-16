@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { SalesFilterPayload } from "../types";
-import { useDashboardSummary } from "../useCustomers";
+import { useDashboardSummary } from "@/app/(protected)/(dashboard)/customerDashboard/useCustomers";
 
 function AnimatedCard({ children }: { children: React.ReactNode }) {
   const controls = useAnimation();

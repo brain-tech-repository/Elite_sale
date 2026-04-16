@@ -114,7 +114,7 @@ export default function MyForm1({
               )}
             />
 
-            <div className="flex gap-6 pt-6">
+            {/* <div className="flex gap-6 pt-6">
               <Button
                 type="submit"
                 className="shadow-xm bg-[#022235] cursor-pointer"
@@ -129,7 +129,7 @@ export default function MyForm1({
               >
                 Reset
               </Button>
-            </div>
+            </div> */}
           </div>
 
           {/* ================= Buttons ================= */}
