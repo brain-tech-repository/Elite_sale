@@ -51,7 +51,7 @@ export function AutoComplete({
   const [open, setOpen] = React.useState(false);
 
   const selectedLabel = React.useMemo(() => {
-    if (value === "all") return "All Selected";
+    if (value === "0") return "All Selected";
     return options.find((option) => option.value === value)?.label;
   }, [options, value]);
 
@@ -95,7 +95,7 @@ export function AutoComplete({
               {enableSelectAll && (
                 <CommandItem
                   onSelect={() => {
-                    onChange("all");
+                    onChange("0");
                     setOpen(false);
                   }}
                 >

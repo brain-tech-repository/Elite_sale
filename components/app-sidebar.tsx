@@ -120,6 +120,11 @@ const data = {
           url: "/stock-laser-report",
           icon: Bot,
         },
+        {
+          title: "Salesman Location Tracking ",
+          url: "/salesman-location-tracking",
+          icon: Bot,
+        },
       ],
     },
   ],
