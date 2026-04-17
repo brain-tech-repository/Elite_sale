@@ -40,7 +40,7 @@ type Props = {
 };
 
 export function SectionCards({ filters }: Props) {
-  const { data, isLoading } = useDashboardSummary(filters);
+  const { data, isLoading } = useDashboardSummary();
 
   const result = data?.data || {};
   const cardsData = [
