@@ -31,22 +31,25 @@ export const description = "A bar chart";
 /* ---------------- REGION COLOR PALETTE ---------------- */
 
 const regionColorMap: Record<string, string> = {
-  "mid west": "#1f77b4",
-  "north west": "#bcbd22  ",
-  "south west": "#072246 ",
-  nile: "#a7ee74",
-  CENTRAL: "#213e88",
-  central: "#0e6c79", // ✅ FIXED
-  albertine: "#1a503a",
-  "west nile": "#7f7f7f",
-  east: "#3fa880",
-  north: "#17becf",
-  "lake zone": "#4e79a7",
-  "west w": "#f28e2b",
-  south: "#76b7b2",
-  metro: "#59a14f",
-};
+  "mid west": "#168ee4", // blue
+  "north west": "#28c9d4", // cyan
+  "south west": "#0d8faf", // teal blue
+  nile: "#072246", // navy
 
+  central: "#0e6c79", // dark teal
+  "central 1": "#033042", // royal blue
+  "central 2": "#6c64db", // green
+
+  albertine: "#1f7051", // forest green
+  "west nile": "#26570f", // olive green
+  east: "#3fa880", // mint green
+  north: "#17becf", // aqua
+
+  "lake zone": "#4e79a7", // steel blue
+  "west w": "#321f99", // indigo
+  south: "#2a857d", // sea green
+  metro: "#8a6d1f", // mustard brown
+};
 /* ---------------- CHART CONFIG ---------------- */
 
 const chartConfig = {

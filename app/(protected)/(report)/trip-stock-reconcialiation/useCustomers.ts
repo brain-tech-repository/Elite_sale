@@ -103,25 +103,3 @@ export const useStockLedgerReport = (payload: SalesFilterPayload) => {
     enabled: !!payload.fromdate && !!payload.todate,
   });
 };
-
-/**
- * Hook to fetch detailed info for a specific material/row
- */
-export const useStockLedgerDetails = (id: string | number | undefined) => {
-  return useQuery({
-    queryKey: ["stock-ledger-details", id],
-    enabled: !!id,
-    queryFn: async () => {
-      // Sending the id as the value for the "material" key in the payload
-      const { data } = await api.post<any>("/stock-ledger-report-popup", {
-        material: id,
-      });
-
-      if (data.status && data.data && data.data.length > 0) {
-        return data.data[0];
-      }
-
-      return null;
-    },
-  });
-};

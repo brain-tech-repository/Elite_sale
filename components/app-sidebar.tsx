@@ -125,6 +125,11 @@ const data = {
           url: "/salesman-location-tracking",
           icon: Bot,
         },
+        {
+          title: "Trip Stock Reconcialiation",
+          url: "/trip-stock-reconcialiation",
+          icon: Bot,
+        },
       ],
     },
   ],
