@@ -102,3 +102,18 @@ export type PerformanceRow = {
   dzn: number | string;
   pcs: number | string;
 };
+
+export interface StockLedgerResponse {
+  status: boolean;
+  message: string;
+  data: StockLedgerItem[];
+  total_closing_value: string;
+  pagination: {
+    total_records: number;
+    total_pages: number;
+    current_page: number;
+    per_page: number;
+    next_page_url: string | null;
+    prev_page_url: string | null;
+  };
+}

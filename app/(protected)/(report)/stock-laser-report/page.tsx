@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { SalesFilterPayload } from "./types";
 import { CommonDataTables } from "@/components/table-data/common-tables";
 import MyForm from "./components/filter";
@@ -27,13 +27,29 @@ export default function CustomerDashboard() {
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data: reportResponse, isFetching } =
-    useStockLedgerReport(globalFilters);
-  const allData = reportResponse?.data || [];
+  // ✅ SINGLE HOOK CALL: Using the infinite query version
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isLoading, // Initial loading state
+    isFetchingNextPage, // Loading more state
+  } = useStockLedgerReport(globalFilters);
+
+  // ✅ MEMOIZED DATA: Flatten all pages into one array for the table
+  const flatData = useMemo(
+    () => data?.pages.flatMap((page) => page.data) ?? [],
+    [data],
+  );
+
+  // ✅ PAGINATION: Get info from the last fetched page to show stats
+  const lastPagination = data?.pages[data.pages.length - 1]?.pagination;
 
   const handleExportAll = () => {
+    if (flatData.length === 0) return;
     const dateStr = globalFilters.fromdate || "report";
-    exportToCSV(allData, `stock_report_${dateStr}`);
+    // Exports whatever is currently loaded in the infinite scroll
+    exportToCSV(flatData, `stock_report_${dateStr}`);
   };
 
   const handleFilterChange = (f: SalesFilterPayload) => {
@@ -67,12 +83,19 @@ export default function CustomerDashboard() {
           ) : (
             <CommonDataTables
               columns={performanceColumns}
-              data={allData}
+              data={flatData}
               headerTitle={"Stock Ledger Table"}
-              isFetching={isFetching}
+              pagination={lastPagination}
+              // isFetching={isFetching}
+              isFetching={isLoading}
               onFilter={handleFilterChange}
               onExport={handleExportAll}
               onRowClick={handleRowClick}
+              onNext={() => {
+                if (hasNextPage && !isFetchingNextPage) {
+                  fetchNextPage();
+                }
+              }}
             />
           )}
         </section>
