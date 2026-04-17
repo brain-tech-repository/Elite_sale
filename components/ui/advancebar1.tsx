@@ -141,17 +141,21 @@ export function AdvancedBarChart1({
         <CardTitle>{title}</CardTitle>
 
         {showFilter && (
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 w-full sm:w-auto">
             {/* YEAR */}
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm">
-                  Year: {year}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full sm:w-auto justify-between"
+                >
+                  <span className="truncate">Year: {year}</span>
                 </Button>
               </PopoverTrigger>
 
-              <PopoverContent className="w-[220px]">
-                {/* 🔽 Years Grid */}
+              <PopoverContent className="w-[95vw] sm:w-[220px] max-w-[220px]">
+                {/* Years Grid */}
                 <div className="grid grid-cols-3 gap-2 mb-2">
                   {visibleYears.map((y) => (
                     <Button
@@ -165,7 +169,7 @@ export function AdvancedBarChart1({
                   ))}
                 </div>
 
-                {/* 🔽 Pagination Controls (Bottom) */}
+                {/* Pagination */}
                 <div className="flex justify-between">
                   <Button
                     size="icon"
@@ -195,12 +199,16 @@ export function AdvancedBarChart1({
             {/* MONTH */}
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm">
-                  Month: {month}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full sm:w-auto justify-between"
+                >
+                  <span className="truncate">Month: {month}</span>
                 </Button>
               </PopoverTrigger>
 
-              <PopoverContent className="w-[220px]">
+              <PopoverContent className="w-[95vw] sm:w-[220px] max-w-[220px]">
                 <div className="grid grid-cols-3 gap-2">
                   {months.map((m) => (
                     <Button
@@ -219,12 +227,16 @@ export function AdvancedBarChart1({
             {/* SORT */}
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm">
-                  Sort: {sortType}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full sm:w-auto justify-between"
+                >
+                  <span className="truncate">Sort: {sortType}</span>
                 </Button>
               </PopoverTrigger>
 
-              <PopoverContent className="w-[180px]">
+              <PopoverContent className="w-[95vw] sm:w-[180px] max-w-[180px]">
                 <div className="flex flex-col gap-2">
                   <Button
                     size="sm"
