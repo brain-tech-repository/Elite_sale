@@ -40,38 +40,37 @@ export function SectionCards({ filters }: Props) {
       title: "Planned Outlet",
       value: 120,
       percentage: 100,
-      color: "bg-gradient-to-r from-[#1E6C8E] to-[#2E7775] text-white",
+      color: "bg-gradient-to-r from-[#2c3e50] to-[#3b5f85] text-white",
     },
     {
       title: "Visited Outlet",
       value: 95,
       percentage: 79,
-      color: "bg-gradient-to-r from-[#243748] to-[#4B749F] text-white",
+      color: "bg-gradient-to-r from-[#15803d] to-[#16a34a] text-white",
     },
     {
       title: "Pending  Visit",
       value: 25,
       percentage: 21,
-      color: "bg-gradient-to-r from-[#134E5E] to-[#71B280] text-white",
+      color: "bg-gradient-to-r from-[#9ca3af] to-[#7c8591] text-white",
     },
     {
       title: "Closed Outlet",
       value: 80,
       percentage: 67,
-      color:
-        "bg-gradient-to-r from-[#0F2027] via-[#203A43] to-[#2C5364] text-white",
+      color: "bg-gradient-to-r from-[#ea580c] to-[#f97316] text-white",
     },
     {
       title: "Productive Outlet",
       value: 60,
       percentage: 50,
-      color: "bg-gradient-to-r from-[#2b5876] to-[#4e4376] text-white",
+      color: "bg-gradient-to-r from-[#1E6C8E] to-[#2E7775] text-white",
     },
     {
       title: "Unplanned Visit",
       value: 35,
       percentage: 29,
-      color: "bg-gradient-to-r from-[#09203f] to-[#537895] text-white",
+      color: "bg-gradient-to-r from-[#ef4444] to-[#f87171] text-white",
     },
   ];
 

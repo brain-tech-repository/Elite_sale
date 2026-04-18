@@ -34,12 +34,7 @@ type Props = {
    SCHEMA
 ========================= */
 const formSchema = z.object({
-  dateRange: z
-    .object({
-      from: z.date(),
-      to: z.date(),
-    })
-    .optional(),
+  date: z.date().optional(), // ✅ single date
   region: z.string().optional(),
   sub_region: z.string().optional(),
   warehouse: z.string().optional(),
@@ -53,7 +48,7 @@ export default function MyForm({ onFilter }: Props) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      dateRange: undefined,
+      date: undefined,
       region: "",
       sub_region: "",
       warehouse: "",
@@ -65,18 +60,18 @@ export default function MyForm({ onFilter }: Props) {
 
   /* API DATA */
 
-  const { data: regions = [] } = useRegions();
+  // const { data: regions = [] } = useRegions();
+  const regions = [
+    { label: "John Doe", value: "s1" },
+    { label: "Jane Smith", value: "s2" },
+    { label: "Michael Knight", value: "s3" },
+    { label: "Sarah Connor", value: "s4" },
+    { label: "James Bond", value: "s5" },
+  ];
 
   function onSubmit(values: FormValues) {
     const payload = {
-      fromdate: values.dateRange?.from
-        ? format(values.dateRange.from, "yyyy-MM-dd")
-        : "",
-
-      todate: values.dateRange?.to
-        ? format(values.dateRange.to, "yyyy-MM-dd")
-        : "",
-
+      date: values.date ? format(values.date, "yyyy-MM-dd") : "",
       region_id: values.region || "0",
       sub_region_id: values.sub_region || "0",
       warehouse_id: values.warehouse || "0",
@@ -102,51 +97,43 @@ export default function MyForm({ onFilter }: Props) {
 
           <FormField
             control={form.control}
-            name="dateRange"
-            render={({ field }) => {
-              const dateRange = field.value as DateRange | undefined;
-              const isDateSelected = dateRange?.from && dateRange?.to;
+            name="date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Date</FormLabel>
 
-              return (
-                <FormItem>
-                  <FormLabel>Date Range</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "pl-3 text-left font-normal shadow-xm w-full",
+                          !field.value && "text-muted-foreground",
+                        )}
+                      >
+                        {field.value
+                          ? format(field.value, "dd/MM/yy")
+                          : "Pick a date"}
 
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "pl-3 text-left font-normal shadow-xm w-full",
-                            !dateRange?.from && "text-muted-foreground",
-                          )}
-                        >
-                          {isDateSelected
-                            ? `${format(dateRange.from!, "dd/MM/yy")} - ${format(
-                                dateRange.to!,
-                                "dd/MM/yy",
-                              )}`
-                            : "Pick a date range"}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
 
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
+                  <PopoverContent align="start" className="p-0 w-auto ">
+                    <Calendar
+                      mode="single" // ✅ IMPORTANT CHANGE
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
 
-                    <PopoverContent align="start" className="p-0 w-auto">
-                      <Calendar
-                        mode="range"
-                        selected={dateRange}
-                        onSelect={(range) => field.onChange(range)}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-
-                  <FormMessage />
-                </FormItem>
-              );
-            }}
+                <FormMessage />
+              </FormItem>
+            )}
           />
 
           {/* ================= Region ================= */}

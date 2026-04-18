@@ -33,8 +33,8 @@ export default function Salesdashboa() {
           <DataTableHeader title="Salesman Location Tracking" />
         </header>
 
-        <div className="px-2">
-          <Card className="shadow-xs lg:px-4 mb-4">
+        <div className="px-2 ">
+          <Card className="shadow-xs lg:px-4 mb-4 ">
             <MyForm onFilter={handleGlobalFilterChange} />
           </Card>
         </div>
@@ -44,8 +44,8 @@ export default function Salesdashboa() {
         </section>
 
         {/* ✅ MAP SECTION */}
-        <section className="px-2 mb-6">
-          <Card className="p-4">
+        <section className="px-2 mb-6 relative z-0">
+          <Card className="p-4 ">
             <h2 className="mb-4 font-semibold">Location Map</h2>
             <LeafletMap />
           </Card>
