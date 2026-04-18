@@ -87,10 +87,20 @@ export const useStockLedgerReport = (payload: SalesFilterPayload) => {
         length: 10, // Per page count
       };
 
-      const { data } = await api.post<StockLedgerResponse>(
-        "/stock-ledger-report",
-        apiPayload,
-      );
+      const { data } = await api.post("/stock-ledger-report", apiPayload);
+
+      // ✅ FIX START
+      if (!data.status) {
+        return {
+          data: [],
+          pagination: {
+            current_page: 1,
+            total_pages: 1,
+          },
+        };
+      }
+      // ✅ FIX END
+
       return data;
     },
     initialPageParam: 1,
@@ -100,7 +110,7 @@ export const useStockLedgerReport = (payload: SalesFilterPayload) => {
       const total = lastPage.pagination.total_pages;
       return current < total ? current + 1 : undefined;
     },
-    enabled: !!payload.fromdate && !!payload.todate,
+    enabled: !!payload.fromdate && !!payload.todate, // ✅ FIX
   });
 };
 

@@ -5,7 +5,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { AutoComplete } from "@/components/ui/autocomplete";
+
 import {
   Form,
   FormField,
@@ -81,6 +83,7 @@ export default function MyForm({ onFilter }: Props) {
     }
   };
 
+  /* ---------------- SUBMIT ---------------- */
   function onSubmit(values: SalesFilterFormValues) {
     const payload: SalesFilterPayload = {
       trip_number: values.trip_number,
@@ -97,7 +100,7 @@ export default function MyForm({ onFilter }: Props) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4 max-w-7xl mx-auto py-1 px-2"
+        className="space-y-4 max-w-7xl mx-auto py-2 px-2"
       >
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-5">
           {/* TRIP NUMBER */}
@@ -125,12 +128,13 @@ export default function MyForm({ onFilter }: Props) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Trip Date</FormLabel>
-                <input
-                  value={field.value}
-                  readOnly
-                  className="w-full h-10 px-3 border rounded-md bg-gray-100"
+                <Input
+                  {...field}
+                  // readOnly
                   placeholder="Auto Fill"
+                  className="bg-muted cursor-not-allowed"
                 />
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -142,12 +146,13 @@ export default function MyForm({ onFilter }: Props) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Route</FormLabel>
-                <input
-                  value={field.value}
+                <Input
+                  {...field}
                   readOnly
-                  className="w-full h-10 px-3 border rounded-md bg-gray-100"
                   placeholder="Auto Fill"
+                  className="bg-muted cursor-not-allowed"
                 />
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -159,12 +164,13 @@ export default function MyForm({ onFilter }: Props) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Salesman</FormLabel>
-                <input
-                  value={field.value}
+                <Input
+                  {...field}
                   readOnly
-                  className="w-full h-10 px-3 border rounded-md bg-gray-100"
                   placeholder="Auto Fill"
+                  className="bg-muted cursor-not-allowed"
                 />
+                <FormMessage />
               </FormItem>
             )}
           />
