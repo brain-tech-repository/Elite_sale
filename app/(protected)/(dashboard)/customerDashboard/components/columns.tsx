@@ -28,10 +28,10 @@ export const performanceColumns: ColumnDef<PerformanceRow>[] = [
     accessorKey: "serial_no",
     header: "S. No.",
   },
-  {
-    accessorKey: "date",
-    header: "Date",
-  },
+  // {
+  //   accessorKey: "date",
+  //   header: "Date",
+  // },
   {
     accessorKey: "customer_code",
     header: "Customer Code",
@@ -44,32 +44,33 @@ export const performanceColumns: ColumnDef<PerformanceRow>[] = [
     accessorKey: "customer_category_name",
     header: "Customer Segment",
   },
-
-  {
-    accessorKey: "last_transaction",
-    header: "Last Transaction",
-    cell: ({ row }) => formatNumber(row.original.last_transaction),
-  },
-  {
-    accessorKey: "total_collection",
-    header: "Total Collection",
-    cell: ({ row }) => formatNumber(row.original.total_collection),
-  },
   {
     accessorKey: "total_invoice_value",
     header: "Total Invoice Value",
     cell: ({ row }) => formatNumber(row.original.total_invoice_value),
   },
   {
-    accessorKey: "amount",
-    header: "Amount",
-    cell: ({ row }) => formatNumber(row.original.amount),
+    accessorKey: "total_collection",
+    header: "Total Collection",
+    cell: ({ row }) => formatNumber(row.original.total_collection),
   },
+
   {
-    accessorKey: "total_invoice_amount",
-    header: "Total Invoice Amount",
-    cell: ({ row }) => formatNumber(row.original.total_invoice_amount),
+    accessorKey: "last_transaction",
+    header: "Last Transaction",
+    cell: ({ row }) => formatNumber(row.original.last_transaction),
   },
+
+  // {
+  //   accessorKey: "amount",
+  //   header: "Amount",
+  //   cell: ({ row }) => formatNumber(row.original.amount),
+  // },
+  // {
+  //   accessorKey: "total_invoice_amount",
+  //   header: "Total Invoice Amount",
+  //   cell: ({ row }) => formatNumber(row.original.total_invoice_amount),
+  // },
   {
     accessorKey: "per_day",
     header: "Per Day",

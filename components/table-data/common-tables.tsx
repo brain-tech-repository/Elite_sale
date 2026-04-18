@@ -68,22 +68,23 @@ export function CommonDataTables<TData, TValue>({
 
   const [columnOrder, setColumnOrder] = React.useState<string[]>([]);
 
-  // ✅ Load from localStorage
-  React.useEffect(() => {
-    const saved = localStorage.getItem("table-column-order");
+  // // ✅ Load from localStorage
+  // React.useEffect(() => {
+  //   const saved = localStorage.getItem("table-column-order");
 
-    if (saved) {
-      setColumnOrder(JSON.parse(saved));
-    } else {
-      setColumnOrder(columnIds);
-    }
-  }, [columnIds]);
-  // ✅ Load from localStorage
-  React.useEffect(() => {
-    if (columnOrder.length) {
-      localStorage.setItem("table-column-order", JSON.stringify(columnOrder));
-    }
-  }, [columnOrder]);
+  //   if (saved) {
+  //     setColumnOrder(JSON.parse(saved));
+  //   } else {
+  //     setColumnOrder(columnIds);
+  //   }
+  // }, [columnIds]);
+  // // ✅ Load from localStorage
+  // React.useEffect(() => {
+  //   if (columnOrder.length) {
+  //     localStorage.setItem("table-column-order", JSON.stringify(columnOrder));
+  //   }
+  // }, [columnOrder]);
+
   const columnsMap = React.useMemo(() => {
     const map: Record<string, string> = {};
 

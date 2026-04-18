@@ -39,9 +39,7 @@ export const salesColumns: ColumnDef<MaterialPerformance>[] = [
   {
     header: "Unit Price",
     accessorKey: "unit_price",
-    cell: ({ row }) => (
-      <span>₹ {row.original.unit_price?.toLocaleString()}</span>
-    ),
+    cell: ({ row }) => <span>{row.original.unit_price?.toLocaleString()}</span>,
   },
   {
     header: "CAR",
@@ -57,7 +55,7 @@ export const salesColumns: ColumnDef<MaterialPerformance>[] = [
     header: "Total Value",
     accessorKey: "total_value",
     cell: ({ row }) => (
-      <span>₹ {row.original.total_value?.toLocaleString()}</span>
+      <span>{row.original.total_value?.toLocaleString()}</span>
     ),
   },
 ];
