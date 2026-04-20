@@ -169,12 +169,17 @@ export default function Salesdashboa() {
             isLoading={regionLoading}
             items={[
               {
-                label: "Completion Rate",
-                value: Number(regionData?.completion_rate || 0),
+                label: "Completion Rat",
+                value: Number(
+                  (regionData?.completion_rate || "0").replace(/,/g, ""),
+                ),
               },
+
               {
                 label: "Success Rate",
-                value: Number(regionData?.success_rate || 0),
+                value: Number(
+                  (regionData?.success_rate || "0").replace(/,/g, ""),
+                ),
               },
               {
                 label: "Incompletion Rate",
