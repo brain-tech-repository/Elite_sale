@@ -156,7 +156,7 @@ export default function Salesdashboa() {
         {/* ================= CHARTS & KPI CARDS ================= */}
         <section className="grid gap-2 lg:px-6 lg:pr-10 px-1 pb-8 grid-cols-1 lg:grid-cols-[30%_40%_30%]">
           {/* KPI CARDS */}
-          {isFilterLoading ? (
+          {isPageLoading ? (
             <SectionCardsSkeleton />
           ) : (
             <SectionCards
