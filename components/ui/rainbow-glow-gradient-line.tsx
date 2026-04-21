@@ -159,6 +159,7 @@ export function RainbowGlowGradientLineChart({
               minTickGap={20} // Forces Recharts to space ticks out mathematically (e.g., 1, 5, 10, 15)
               tickMargin={10} // Adds a little breathing room below the line
               tick={{ fontSize: 12 }}
+              tickFormatter={(value) => String(value).split(" ")[0]} // 👈 ADD THIS
             />
             {/* 3. Pass the custom ticks and force interval to 0 */}
             {/* <XAxis

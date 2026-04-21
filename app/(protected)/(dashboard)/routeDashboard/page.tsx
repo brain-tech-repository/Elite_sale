@@ -48,10 +48,10 @@ export default function Salesdashboa() {
   );
 
   // 🔹 Table Pagination States
-  const [tableFilters, setTableFilters] = useState<SalesFilterPayload>({
-    page: 1,
-    length: 10,
-  });
+  // Replace: const [tableFilters, setTableFilters] = useState(...)
+  const [salesPage, setSalesPage] = useState(1);
+  const [efficiencyPage, setEfficiencyPage] = useState(1);
+  const PAGE_LENGTH = 10;
 
   // 🔹 Local state for appended data
   const [efficiencyData, setEfficiencyData] = useState<any[]>([]);
@@ -59,7 +59,7 @@ export default function Salesdashboa() {
   const [selectedPerfRouteId, setSelectedPerfRouteId] = useState<string>("");
   const [selectedExpRouteId, setSelectedExpRouteId] = useState<string>("");
 
-  const currentPage = tableFilters.page ?? 1;
+  // const currentPage = tableFilters.page ?? 1;
 
   /* =========================
         CALLBACK HANDLERS
@@ -71,22 +71,17 @@ export default function Salesdashboa() {
     [],
   );
 
+  // Replace: const handleLoadMore = () => { ... }
+  const handleLoadMoreSales = () => setSalesPage((prev) => prev + 1);
+  const handleLoadMoreEfficiency = () => setEfficiencyPage((prev) => prev + 1);
+
+  // Inside handleGlobalFilterChange, reset both:
   const handleGlobalFilterChange = (filters: SalesFilterPayload) => {
     setGlobalFilters(filters);
-    setSelectedPerfRouteId(""); // Reset selection on filter change
-    setSelectedExpRouteId(""); // Reset selection on filter change
-    setTableFilters((prev) => ({ ...prev, page: 1 }));
-    setGlobalFilters(filters);
-    // setTableFilters((prev) => ({ ...prev, page: 1 }));
+    setSalesPage(1); // Reset specific page
+    setEfficiencyPage(1); // Reset specific page
     setEfficiencyData([]);
     setSalesReportData([]);
-  };
-
-  const handleLoadMore = () => {
-    setTableFilters((prev) => ({
-      ...prev,
-      page: (prev.page ?? 1) + 1,
-    }));
   };
 
   /* =========================
@@ -121,32 +116,41 @@ export default function Salesdashboa() {
   const { data: expenseGraph, isFetching: expenseGraphFetching } =
     useRouteExpenseGraph(globalFilters, selectedExpRouteId);
 
+  // Efficiency Hook
   const { data: efficiencyRes, isFetching: efficiencyFetching } =
-    useRouteEfficiency({ ...globalFilters, ...tableFilters });
+    useRouteEfficiency({
+      ...globalFilters,
+      page: efficiencyPage,
+      length: PAGE_LENGTH,
+    });
+
+  // Sales Report Hook
   const { data: salesRes, isFetching: salesFetching } = useRouteWiseSales({
     ...globalFilters,
-    ...tableFilters,
+    page: salesPage,
+    length: PAGE_LENGTH,
   });
 
   /* =========================
         DATA SYNC EFFECTS
      ========================= */
+  // Efficiency Effect
   useEffect(() => {
     const newData = efficiencyRes?.tableData;
     if (!newData) return;
-    if (currentPage === 1) setEfficiencyData(newData);
+    if (efficiencyPage === 1) setEfficiencyData(newData);
     else setEfficiencyData((prev) => [...prev, ...newData]);
-  }, [efficiencyRes?.tableData, currentPage]);
+  }, [efficiencyRes?.tableData, efficiencyPage]); // Use efficiencyPage
 
+  // Sales Effect
   useEffect(() => {
     const newData = salesRes?.tableData;
     if (!newData) return;
-    if (currentPage === 1) setSalesReportData(newData);
+    if (salesPage === 1) setSalesReportData(newData);
     else setSalesReportData((prev) => [...prev, ...newData]);
-  }, [salesRes?.tableData, currentPage]);
-
-  const isEfficiencyInitialLoading = efficiencyFetching && currentPage === 1;
-  const isSalesInitialLoading = salesFetching && currentPage === 1;
+  }, [salesRes?.tableData, salesPage]); // Use salesPage
+  const isEfficiencyInitialLoading = efficiencyFetching && efficiencyPage === 1;
+  const isSalesInitialLoading = salesFetching && salesPage === 1;
 
   return (
     <div className="flex flex-1 flex-col">
@@ -208,11 +212,15 @@ export default function Salesdashboa() {
               height={150}
               data={revenueData}
             />
-            <RainbowGlowGradientLineChart
-              title="Drop Size by Volume"
-              height={150}
-              data={volumeData}
-            />
+            <div className="overflow-x-auto">
+              <div style={{ minWidth: `${volumeData.length * 35}px` }}>
+                <RainbowGlowGradientLineChart
+                  title="Drop Size by Volume"
+                  height={150}
+                  data={volumeData}
+                />
+              </div>
+            </div>
           </div>
         </section>
         {/* PERFORMANCE SECTION */}{" "}
@@ -278,10 +286,10 @@ export default function Salesdashboa() {
           <CommonDataTables
             columns={routeSalesColumns}
             data={salesReportData}
+            isFetching={salesFetching && salesPage === 1}
+            isFetchingMore={salesFetching && salesPage > 1}
+            onNext={handleLoadMoreSales} // Use Sales handler
             pagination={salesRes?.pagination}
-            isFetching={isSalesInitialLoading}
-            isFetchingMore={salesFetching && currentPage > 1}
-            onNext={handleLoadMore}
           />
         </section>
         <section className="px-2 pb-12">
@@ -290,10 +298,10 @@ export default function Salesdashboa() {
           <CommonDataTables
             columns={salesColumns}
             data={efficiencyData}
+            isFetching={efficiencyFetching && efficiencyPage === 1}
+            isFetchingMore={efficiencyFetching && efficiencyPage > 1}
+            onNext={handleLoadMoreEfficiency} // Use Efficiency handler
             pagination={efficiencyRes?.pagination}
-            isFetching={isEfficiencyInitialLoading}
-            isFetchingMore={efficiencyFetching && currentPage > 1}
-            onNext={handleLoadMore}
           />
         </section>
       </div>
