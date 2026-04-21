@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "customer_code": "CUST001",
+    "customer_name": "Rahul Traders",
+    "customer_segment": "Retail",
+    "last_transaction": "2026-03-10",
+    "total_sales": 12000,
+    "total_collection": 10000,
+    "total_return": 500,
+    "total_exchange": 200,
+    "pending_collection": 1500
+  },
+  {
+    "id": 2,
+    "customer_code": "CUST002",
+    "customer_name": "Sharma Distributors",
+    "customer_segment": "Wholesale",
+    "last_transaction": "2026-03-12",
+    "total_sales": 15000,
+    "total_collection": 12000,
+    "total_return": 700,
+    "total_exchange": 300,
+    "pending_collection": 2000
+  }
+]

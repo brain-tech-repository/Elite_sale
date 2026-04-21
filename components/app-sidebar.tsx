@@ -130,6 +130,11 @@ const data = {
           url: "/trip-stock-reconcialiation",
           icon: Bot,
         },
+        {
+          title: "Sm Weekly Sales Report",
+          url: "/sm-weekly-sales-report",
+          icon: Bot,
+        },
       ],
     },
   ],
