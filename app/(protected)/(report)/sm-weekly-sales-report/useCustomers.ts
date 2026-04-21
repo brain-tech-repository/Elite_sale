@@ -78,9 +78,7 @@ export const useStockLedgerReport = (payload: SalesFilterPayload) => {
     queryFn: async ({ pageParam = 1 }) => {
       const apiPayload = {
         warehouse: payload.warehouse_id,
-        material: payload.material_id,
-        brand: payload.brand_id,
-        type: payload.material_type_id,
+
         fromdate: payload.fromdate,
         todate: payload.todate,
         page: pageParam, // Send current page to API
